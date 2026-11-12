@@ -28,6 +28,7 @@
 #include "common/log.h"
 #include "common/path.h"
 #include "common/string_util.h"
+#include "common/threading.h"
 
 #include <Foundation/Foundation.h>
 #include <dispatch/dispatch.h>
@@ -40,6 +41,8 @@
 #include <functional>
 #include <mutex>
 #include <thread>
+
+#include <signal.h>
 
 Log_SetChannel(IOSHost);
 
@@ -56,7 +59,6 @@ static std::unique_ptr<INISettingsInterface> s_settings;
 static std::string s_documents_dir;
 static std::string s_games_dir;
 
-static std::thread s_cpu_thread;
 static std::thread::id s_cpu_thread_id;
 static std::mutex s_queue_mutex;
 static std::condition_variable s_queue_cv;
@@ -147,7 +149,17 @@ bool IOSHost::Initialize(const std::string& documents_dir, const std::string& bu
   SDL_SetMainReady();
 
   s_shutdown_requested.store(false);
-  s_cpu_thread = std::thread(&IOSHost::CPUThreadMain);
+  // iOS gives secondary threads a 512KB stack; shader compilation (glslang) and boot need far more.
+  {
+    Threading::Thread cpu_thread;
+    cpu_thread.SetStackSize(16 * 1024 * 1024);
+    if (!cpu_thread.Start(&IOSHost::CPUThreadMain))
+    {
+      *error = "Failed to start the CPU thread.";
+      return false;
+    }
+    cpu_thread.Detach();
+  }
   return true;
 }
 
@@ -237,6 +249,13 @@ void IOSHost::CPUThreadMain()
 {
   s_cpu_thread_id = std::this_thread::get_id();
   pthread_setname_np("DuckStation CPU");
+
+  // Lets the crash handler report even if this thread overflows its stack.
+  static char alt_stack[256 * 1024];
+  stack_t ss = {};
+  ss.ss_sp = alt_stack;
+  ss.ss_size = sizeof(alt_stack);
+  sigaltstack(&ss, nullptr);
 
   Error error;
   if (!System::Internal::CPUThreadInitialize(&error))

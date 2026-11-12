@@ -407,7 +407,12 @@ bool MetalDevice::CreateLayer()
         INFO_LOG("Creating a {}x{} Metal layer.", m_window_info.surface_width, m_window_info.surface_height);
         const auto size =
           CGSizeMake(static_cast<float>(m_window_info.surface_width), static_cast<float>(m_window_info.surface_height));
+#ifdef DUCKSTATION_IOS
+        // Owned reference: the superlayer's retain is dropped by removeFromSuperlayer in DestroyLayer().
+        m_layer = [[CAMetalLayer layer] retain];
+#else
         m_layer = [CAMetalLayer layer];
+#endif
         [m_layer setDevice:m_device];
         [m_layer setDrawableSize:size];
 

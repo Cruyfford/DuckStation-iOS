@@ -11,6 +11,11 @@
 
 #include <string>
 
+#include <execinfo.h>
+#include <fcntl.h>
+#include <signal.h>
+#include <unistd.h>
+
 #if !__has_feature(objc_arc)
 #error This file must be compiled with ARC.
 #endif
@@ -154,8 +159,71 @@ static void DSHostEvent(IOSHost::Event event, const char* message)
 
 @end
 
+//////////////////////////////////////////////////////////////////////////
+// Crash reporting: writes the signal/exception and a backtrace to Documents/crash.txt
+//////////////////////////////////////////////////////////////////////////
+
+static char s_crash_path[1024];
+
+static void DSWriteStr(int fd, const char* s)
+{
+  write(fd, s, strlen(s));
+}
+
+static void DSCrashSignalHandler(int sig, siginfo_t* info, void* ctx)
+{
+  const int fd = open(s_crash_path, O_WRONLY | O_CREAT | O_APPEND, 0644);
+  if (fd >= 0)
+  {
+    char buf[128];
+    snprintf(buf, sizeof(buf), "\n=== signal %d (%s) addr=%p ===\n", sig, strsignal(sig), info ? info->si_addr : nullptr);
+    DSWriteStr(fd, buf);
+    void* frames[128];
+    const int n = backtrace(frames, 128);
+    backtrace_symbols_fd(frames, n, fd);
+    close(fd);
+  }
+  signal(sig, SIG_DFL);
+  raise(sig);
+}
+
+static void DSUncaughtException(NSException* e)
+{
+  const int fd = open(s_crash_path, O_WRONLY | O_CREAT | O_APPEND, 0644);
+  if (fd < 0)
+    return;
+  NSString* text = [NSString stringWithFormat:@"\n=== exception %@: %@ ===\n%@\n", e.name, e.reason,
+                                              [e.callStackSymbols componentsJoinedByString:@"\n"]];
+  DSWriteStr(fd, text.UTF8String);
+  close(fd);
+}
+
+static void DSInstallCrashHandlers()
+{
+  NSString* documents = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES).firstObject;
+  strlcpy(s_crash_path, [documents stringByAppendingPathComponent:@"crash.txt"].fileSystemRepresentation,
+          sizeof(s_crash_path));
+
+  NSSetUncaughtExceptionHandler(&DSUncaughtException);
+
+  // Run on an alternate stack so a stack overflow can still be reported.
+  static char alt_stack[256 * 1024];
+  stack_t ss = {};
+  ss.ss_sp = alt_stack;
+  ss.ss_size = sizeof(alt_stack);
+  sigaltstack(&ss, nullptr);
+
+  struct sigaction sa = {};
+  sa.sa_sigaction = &DSCrashSignalHandler;
+  sa.sa_flags = SA_SIGINFO | SA_ONSTACK;
+  sigemptyset(&sa.sa_mask);
+  for (int sig : {SIGSEGV, SIGBUS, SIGABRT, SIGILL, SIGFPE, SIGTRAP})
+    sigaction(sig, &sa, nullptr);
+}
+
 int main(int argc, char* argv[])
 {
+  DSInstallCrashHandlers();
   @autoreleasepool
   {
     return UIApplicationMain(argc, argv, nil, NSStringFromClass([DSAppDelegate class]));
