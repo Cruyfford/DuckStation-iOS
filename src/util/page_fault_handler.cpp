@@ -34,6 +34,10 @@ namespace PageFaultHandler {
 static std::recursive_mutex s_exception_handler_mutex;
 static bool s_in_exception_handler = false;
 static bool s_installed = false;
+#ifndef _WIN32
+static struct sigaction s_old_sigsegv = {};
+static struct sigaction s_old_sigbus = {};
+#endif
 } // namespace PageFaultHandler
 
 #if defined(CPU_ARCH_ARM64)
@@ -218,7 +222,19 @@ void PageFaultHandler::SignalHandler(int sig, siginfo_t* info, void* ctx)
     return;
 
   // We couldn't handle it. Pass it off to the crash dumper.
+#ifdef DUCKSTATION_IOS
+  // The app installs its own crash reporter before us; chain to it.
+  const struct sigaction& old = (sig == SIGBUS) ? s_old_sigbus : s_old_sigsegv;
+  if ((old.sa_flags & SA_SIGINFO) && old.sa_sigaction)
+  {
+    old.sa_sigaction(sig, info, ctx);
+    return;
+  }
+  signal(sig, SIG_DFL);
+  return;
+#else
   CrashHandler::CrashSignalHandler(sig, info, ctx);
+#endif
 }
 
 bool PageFaultHandler::Install(Error* error)
@@ -235,14 +251,14 @@ bool PageFaultHandler::Install(Error* error)
   // Don't block the signal from executing recursively, we want to fire the original handler.
   sa.sa_flags |= SA_NODEFER;
 #endif
-  if (sigaction(SIGSEGV, &sa, nullptr) != 0)
+  if (sigaction(SIGSEGV, &sa, &s_old_sigsegv) != 0)
   {
     Error::SetErrno(error, "sigaction() for SIGSEGV failed: ", errno);
     return false;
   }
 #if defined(__APPLE__) || defined(__aarch64__)
   // MacOS uses SIGBUS for memory permission violations
-  if (sigaction(SIGBUS, &sa, nullptr) != 0)
+  if (sigaction(SIGBUS, &sa, &s_old_sigbus) != 0)
   {
     Error::SetErrno(error, "sigaction() for SIGBUS failed: ", errno);
     return false;

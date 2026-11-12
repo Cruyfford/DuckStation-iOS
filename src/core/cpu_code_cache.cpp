@@ -181,10 +181,11 @@ bool CPU::CodeCache::ProcessStartup(Error* error)
 {
 #ifdef DUCKSTATION_IOS
   // iOS does not allow executable memory without a JIT entitlement or an attached debugger.
-  // Only the (cached) interpreter is used, so the recompiler code buffer and fastmem fault handler are skipped.
+  // Only the (cached) interpreter is used, so the recompiler code buffer is skipped. The fault handler is still
+  // needed: RAM pages holding cached code are write-protected, and writes to them invalidate the cached blocks.
   s_code_buffer_ptr = nullptr;
   AllocateLUTs();
-  return true;
+  return PageFaultHandler::Install(error);
 #endif
 
 #ifdef USE_CODE_BUFFER_SECTION
