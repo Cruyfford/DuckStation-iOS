@@ -29,10 +29,22 @@ cp "$METALLIB" "$APP/Metal23.metallib"
 cp -R "$ROOT_DIR/data/resources" "$APP/resources"
 find "$APP/resources" -name '.DS_Store' -delete
 
-# Runtime dylibs (shaderc, spirv-cross, soundtouch). Copy real files under every name they may be loaded by.
-for lib in "$DEPS_DIR"/lib/*.dylib; do
-  cp -L "$lib" "$APP/Frameworks/$(basename "$lib")"
+# Runtime dylibs: exactly one copy of each, under the name it is loaded by, with a matching install name.
+#  - libshaderc_shared.dylib / libspirv-cross-c-shared.0.dylib are dlopen()ed by the Metal backend
+#  - libsoundtouch.2.dylib is linked by the executable (@rpath/libsoundtouch.2.dylib)
+for name in libshaderc_shared.dylib libspirv-cross-c-shared.0.dylib libsoundtouch.2.dylib; do
+  cp -L "$DEPS_DIR/lib/$name" "$APP/Frameworks/$name"
+  chmod 755 "$APP/Frameworks/$name"
+  install_name_tool -id "@rpath/$name" "$APP/Frameworks/$name" 2>/dev/null
+  codesign --force --sign - --timestamp=none "$APP/Frameworks/$name" # restore a valid ad-hoc signature
 done
+
+# App icons
+cp "$ROOT_DIR"/scripts/ios/icons/AppIcon*.png "$APP/"
+rm -f "$APP/AppIcon1024.png"
+
+# Strip extended attributes (quarantine etc.) so the archive is clean.
+xattr -cr "$APP" || true
 
 # Make sure the executable finds them.
 if ! otool -l "$APP/DuckStation" | grep -q "@executable_path/Frameworks"; then
@@ -40,6 +52,11 @@ if ! otool -l "$APP/DuckStation" | grep -q "@executable_path/Frameworks"; then
 fi
 
 VERSION="$(git -C "$ROOT_DIR" rev-list --count HEAD 2>/dev/null || echo 1)"
+SDK_VERSION="$(xcrun --sdk iphoneos --show-sdk-version)"
+SDK_BUILD="$(xcrun --sdk iphoneos --show-sdk-build-version)"
+XCODE_VERSION="$(xcodebuild -version | awk '/Xcode/{print $2}' | awk -F. '{printf "%d%d%d0", $1, $2, ($3==""?0:$3)}')"
+XCODE_BUILD="$(xcodebuild -version | awk '/Build version/{print $3}')"
+MAC_BUILD="$(sw_vers -buildVersion)"
 
 cat > "$APP/Info.plist" <<EOF
 <?xml version="1.0" encoding="UTF-8"?>
@@ -57,6 +74,31 @@ cat > "$APP/Info.plist" <<EOF
   <key>CFBundleVersion</key><string>$VERSION</string>
   <key>CFBundleSupportedPlatforms</key><array><string>iPhoneOS</string></array>
   <key>CFBundleLocalizations</key><array><string>en</string><string>ar</string></array>
+  <key>CFBundleIcons</key>
+  <dict>
+    <key>CFBundlePrimaryIcon</key>
+    <dict>
+      <key>CFBundleIconFiles</key><array><string>AppIcon60x60</string></array>
+      <key>CFBundleIconName</key><string>AppIcon</string>
+    </dict>
+  </dict>
+  <key>CFBundleIcons~ipad</key>
+  <dict>
+    <key>CFBundlePrimaryIcon</key>
+    <dict>
+      <key>CFBundleIconFiles</key><array><string>AppIcon60x60</string><string>AppIcon76x76</string><string>AppIcon83.5x83.5</string></array>
+      <key>CFBundleIconName</key><string>AppIcon</string>
+    </dict>
+  </dict>
+  <key>BuildMachineOSBuild</key><string>$MAC_BUILD</string>
+  <key>DTCompiler</key><string>com.apple.compilers.llvm.clang.1_0</string>
+  <key>DTPlatformBuild</key><string>$SDK_BUILD</string>
+  <key>DTPlatformName</key><string>iphoneos</string>
+  <key>DTPlatformVersion</key><string>$SDK_VERSION</string>
+  <key>DTSDKBuild</key><string>$SDK_BUILD</string>
+  <key>DTSDKName</key><string>iphoneos$SDK_VERSION</string>
+  <key>DTXcode</key><string>$XCODE_VERSION</string>
+  <key>DTXcodeBuild</key><string>$XCODE_BUILD</string>
   <key>LSRequiresIPhoneOS</key><true/>
   <key>MinimumOSVersion</key><string>15.0</string>
   <key>UIDeviceFamily</key><array><integer>1</integer><integer>2</integer></array>
@@ -90,11 +132,10 @@ cat > "$APP/Info.plist" <<EOF
 EOF
 plutil -lint "$APP/Info.plist"
 
-# Ad-hoc sign so the bundle is well-formed; the sideloading tool re-signs it with your Apple ID.
-codesign --force --sign - --timestamp=none "$APP/Frameworks/"*.dylib
-codesign --force --sign - --timestamp=none "$APP/Metal23.metallib"
-codesign --force --sign - --timestamp=none "$APP"
-codesign --verify --deep --strict "$APP"
+# Like an Xcode build with CODE_SIGNING_ALLOWED=NO: no bundle signature (signers add their own).
+# Mach-O files keep the linker's ad-hoc signature, which every signer replaces.
+rm -rf "$APP/_CodeSignature"
+plutil -convert binary1 "$APP/Info.plist"
 
 echo "== Bundle contents =="
 ls -la "$APP" "$APP/Frameworks"
@@ -105,7 +146,7 @@ otool -l "$APP/DuckStation" | grep -A2 LC_RPATH || true
 mkdir -p "$(dirname "$OUT_IPA")"
 OUT_ABS="$(cd "$(dirname "$OUT_IPA")" && pwd)/$(basename "$OUT_IPA")"
 rm -f "$OUT_ABS"
-(cd "$STAGE" && zip -qry "$OUT_ABS" Payload)
+(cd "$STAGE" && zip -qrX "$OUT_ABS" Payload)
 rm -rf "$STAGE"
 
 echo "Created $OUT_ABS"
