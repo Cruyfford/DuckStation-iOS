@@ -111,7 +111,16 @@ bool DynamicLibrary::Open(const char* filename, Error* error)
       if (bundle_path.has_value())
       {
 #ifdef DUCKSTATION_IOS
-        std::string frameworks_path = fmt::format("{}/Frameworks/{}", bundle_path.value(), filename);
+        // iOS apps ship libraries as frameworks: libfoo-bar.1.dylib -> Frameworks/foo_bar.framework/foo_bar
+        std::string_view base(filename);
+        if (base.starts_with("lib"))
+          base.remove_prefix(3);
+        base = base.substr(0, base.find('.'));
+        std::string fw_name(base);
+        for (char& ch : fw_name)
+          ch = (ch == '-') ? '_' : ch;
+        std::string frameworks_path =
+          fmt::format("{}/Frameworks/{}.framework/{}", bundle_path.value(), fw_name, fw_name);
 #else
         std::string frameworks_path = fmt::format("{}/Contents/Frameworks/{}", bundle_path.value(), filename);
 #endif

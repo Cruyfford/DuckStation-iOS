@@ -29,15 +29,43 @@ cp "$METALLIB" "$APP/Metal23.metallib"
 cp -R "$ROOT_DIR/data/resources" "$APP/resources"
 find "$APP/resources" -name '.DS_Store' -delete
 
-# Runtime dylibs: exactly one copy of each, under the name it is loaded by, with a matching install name.
-#  - libshaderc_shared.dylib / libspirv-cross-c-shared.0.dylib are dlopen()ed by the Metal backend
-#  - libsoundtouch.2.dylib is linked by the executable (@rpath/libsoundtouch.2.dylib)
-for name in libshaderc_shared.dylib libspirv-cross-c-shared.0.dylib libsoundtouch.2.dylib; do
-  cp -L "$DEPS_DIR/lib/$name" "$APP/Frameworks/$name"
-  chmod 755 "$APP/Frameworks/$name"
-  install_name_tool -id "@rpath/$name" "$APP/Frameworks/$name" 2>/dev/null
-  codesign --force --sign - --timestamp=none "$APP/Frameworks/$name" # restore a valid ad-hoc signature
-done
+# Runtime libraries, packaged as .framework bundles like an Xcode app (no loose .dylib files).
+#  - shaderc_shared / spirv_cross_c_shared are dlopen()ed by the Metal backend (see DynamicLibrary on iOS)
+#  - soundtouch is linked by the executable; its load command is pointed at the framework
+make_framework() {
+  local dylib="$1" name="$2"
+  local fw="$APP/Frameworks/$name.framework"
+  mkdir -p "$fw"
+  cp -L "$DEPS_DIR/lib/$dylib" "$fw/$name"
+  chmod 755 "$fw/$name"
+  install_name_tool -id "@rpath/$name.framework/$name" "$fw/$name" 2>/dev/null
+  cat > "$fw/Info.plist" <<PLIST
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+  <key>CFBundleDevelopmentRegion</key><string>en</string>
+  <key>CFBundleExecutable</key><string>$name</string>
+  <key>CFBundleIdentifier</key><string>com.cruyfford.duckstation.$(echo "$name" | tr '_' '-')</string>
+  <key>CFBundleInfoDictionaryVersion</key><string>6.0</string>
+  <key>CFBundleName</key><string>$name</string>
+  <key>CFBundlePackageType</key><string>FMWK</string>
+  <key>CFBundleShortVersionString</key><string>1.0</string>
+  <key>CFBundleVersion</key><string>1</string>
+  <key>CFBundleSupportedPlatforms</key><array><string>iPhoneOS</string></array>
+  <key>MinimumOSVersion</key><string>15.0</string>
+</dict>
+</plist>
+PLIST
+  plutil -convert binary1 "$fw/Info.plist"
+  codesign --force --sign - --timestamp=none "$fw/$name"
+}
+
+make_framework libshaderc_shared.dylib shaderc_shared
+make_framework libspirv-cross-c-shared.0.dylib spirv_cross_c_shared
+make_framework libsoundtouch.2.dylib soundtouch
+install_name_tool -change "@rpath/libsoundtouch.2.dylib" "@rpath/soundtouch.framework/soundtouch" "$APP/DuckStation" 2>/dev/null
+codesign --force --sign - --timestamp=none "$APP/DuckStation"
 
 # App icons
 cp "$ROOT_DIR"/scripts/ios/icons/AppIcon*.png "$APP/"
@@ -138,7 +166,8 @@ rm -rf "$APP/_CodeSignature"
 plutil -convert binary1 "$APP/Info.plist"
 
 echo "== Bundle contents =="
-ls -la "$APP" "$APP/Frameworks"
+ls -laR "$APP/Frameworks"
+ls -la "$APP"
 echo "== Linked libraries =="
 otool -L "$APP/DuckStation"
 otool -l "$APP/DuckStation" | grep -A2 LC_RPATH || true
