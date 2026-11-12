@@ -27,7 +27,6 @@ LIBJPEGTURBO=3.0.3
 LIBWEBP=1.4.0
 
 CPUINFO=7524ad504fdcfcf75a18a133da6abd75c5d48053
-LUNASVG=9af1ac7b90658a279b372add52d6f77a4ebb482c
 SHADERC=f60bb80e255144e71776e2ad570d89b78ea2ab4f
 SOUNDTOUCH=463ade388f3a51da078dc9ed062bf28e4ba29da7
 SPIRV_CROSS=vulkan-sdk-1.3.290.0
@@ -61,7 +60,6 @@ cat > SHASUMS <<EOF
 c6ef64ca18a19d13df6eb22df9aff19fb0db65610a74cc81dae33a82235cacd4  SDL2-$SDL2.tar.gz
 8c29e06cf42aacc1eafc4077ae2ec6c6fcb96a626157e0593d5e82a34fd403c1  zstd-$ZSTD.tar.gz
 e1351218d270db49c3dddcba04fb2153b09731ea3fa6830e423f5952f44585be  cpuinfo-$CPUINFO.tar.gz
-3998b024b0d442614a9ee270e76e018bb37a17b8c6941212171731123cbbcac7  lunasvg-$LUNASVG.tar.gz
 4c1780b6c65c27c4dcb109f08ab632241c98b77fe2e22be726c151ff514482bf  shaderc-$SHADERC.tar.gz
 fe45c2af99f6102d2704277d392c1c83b55180a70bfd17fb888cc84a54b70573  soundtouch-$SOUNDTOUCH.tar.gz
 EOF
@@ -74,7 +72,6 @@ curl -L --retry 3 \
   -O "https://github.com/libsdl-org/SDL/releases/download/release-$SDL2/SDL2-$SDL2.tar.gz" \
   -O "https://github.com/facebook/zstd/releases/download/v$ZSTD/zstd-$ZSTD.tar.gz" \
   -o "cpuinfo-$CPUINFO.tar.gz" "https://github.com/stenzek/cpuinfo/archive/$CPUINFO.tar.gz" \
-  -o "lunasvg-$LUNASVG.tar.gz" "https://github.com/stenzek/lunasvg/archive/$LUNASVG.tar.gz" \
   -o "shaderc-$SHADERC.tar.gz" "https://github.com/stenzek/shaderc/archive/$SHADERC.tar.gz" \
   -o "soundtouch-$SOUNDTOUCH.tar.gz" "https://github.com/stenzek/soundtouch/archive/$SOUNDTOUCH.tar.gz"
 
@@ -134,13 +131,6 @@ rm -fr "cpuinfo-$CPUINFO" && tar xf "cpuinfo-$CPUINFO.tar.gz" && cd "cpuinfo-$CP
 cmake "${CMAKE_COMMON[@]}" -DCMAKE_SYSTEM_PROCESSOR=arm64 -DCPUINFO_LIBRARY_TYPE=static -DCPUINFO_RUNTIME_TYPE=static \
   -DCPUINFO_LOG_LEVEL=error -DCPUINFO_LOG_TO_STDIO=ON -DCPUINFO_BUILD_TOOLS=OFF -DCPUINFO_BUILD_UNIT_TESTS=OFF \
   -DCPUINFO_BUILD_MOCK_TESTS=OFF -DCPUINFO_BUILD_BENCHMARKS=OFF -DUSE_SYSTEM_LIBS=ON -B build-ios
-cmake --build build-ios --parallel "$NPROCS" && cmake --install build-ios
-cd ..
-echo "::endgroup::"
-
-echo "::group::lunasvg"
-rm -fr "lunasvg-$LUNASVG" && tar xf "lunasvg-$LUNASVG.tar.gz" && cd "lunasvg-$LUNASVG"
-cmake "${CMAKE_COMMON[@]}" -DBUILD_SHARED_LIBS=OFF -DLUNASVG_BUILD_EXAMPLES=OFF -B build-ios
 cmake --build build-ios --parallel "$NPROCS" && cmake --install build-ios
 cd ..
 echo "::endgroup::"
