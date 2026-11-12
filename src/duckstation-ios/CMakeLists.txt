@@ -63,7 +63,6 @@ target_link_libraries(duckstation-ios PRIVATE
   "-framework Foundation"
   "-framework UIKit"
   "-framework SwiftUI"
-  "-framework Observation"
   "-framework Combine"
   "-framework Metal"
   "-framework MetalKit"
