@@ -123,7 +123,7 @@ private func multiplierOptions(_ range: ClosedRange<Int>, labelForOne: DSText, z
 // MARK: - Categories
 
 enum DSSettingsSchema {
-    static let categories: [DSSettingsCategory] = [console, emulation, bios, memoryCards, graphics, pgxp, display, osd, audio, advanced]
+    static let categories: [DSSettingsCategory] = [console, emulation, bios, memoryCards, graphics, pgxp, display, osd, audio, textures, advanced, debug]
 
     static let console = DSSettingsCategory("console", DSText("Console", "الجهاز"), icon: "playstation.logo", [
         DSSettingsGroup(title: DSText("Console", "الجهاز"), settings: [
@@ -364,11 +364,6 @@ enum DSSettingsSchema {
     ])
 
     static let advanced = DSSettingsCategory("advanced", DSText("Advanced", "متقدم"), icon: "wrench.and.screwdriver", [
-        DSSettingsGroup(title: DSText("Texture Replacement", "استبدال الخامات"), settings: [
-            DSSetting("TextureReplacements", "EnableVRAMWriteReplacements", DSText("Enable Background Replacement", "تفعيل استبدال الخلفيات"), .toggle(default: false)),
-            DSSetting("TextureReplacements", "PreloadTextures", DSText("Preload Replacement Textures", "تحميل الخامات البديلة مسبقاً"), .toggle(default: false)),
-            DSSetting("TextureReplacements", "DumpVRAMWrites", DSText("Dump Replaceable Backgrounds", "استخراج الخلفيات القابلة للاستبدال"), .toggle(default: false)),
-        ]),
         DSSettingsGroup(title: DSText("Compatibility", "التوافق"), settings: [
             DSSetting("CPU", "RecompilerICache", DSText("Enable CPU Instruction Cache", "تفعيل ذاكرة تعليمات المعالج"), .toggle(default: false)),
             DSSetting("Hacks", "UseOldMDECRoutines", DSText("Use Old MDEC Routines", "استخدام فك الفيديو القديم (MDEC)"), .toggle(default: false)),
@@ -379,6 +374,48 @@ enum DSSettingsSchema {
                 DSOption("VC2B", "VC2B", "VC2B"), DSOption("VC3A", "VC3A", "VC3A"), DSOption("VC3B", "VC3B", "VC3B"),
                 DSOption("VC3C", "VC3C", "VC3C"),
             ])),
+        ]),
+    ])
+
+    static let textures = DSSettingsCategory("textures", DSText("Texture Replacement", "استبدال الخامات"), icon: "photo.stack", [
+        DSSettingsGroup(title: DSText("Replacement", "الاستبدال"), settings: [
+            DSSetting("TextureReplacements", "EnableVRAMWriteReplacements", DSText("Enable Background Replacement", "تفعيل استبدال الخلفيات"), .toggle(default: false),
+                help: DSText("Put PNG files in Files › DuckStation › textures › [Game Serial].", "ضع ملفات PNG في: الملفات › DuckStation › textures › [رقم اللعبة].")),
+            DSSetting("TextureReplacements", "PreloadTextures", DSText("Preload Replacement Textures", "تحميل الخامات البديلة مسبقاً"), .toggle(default: false)),
+        ]),
+        DSSettingsGroup(title: DSText("Dumping", "الاستخراج"), settings: [
+            DSSetting("TextureReplacements", "DumpVRAMWrites", DSText("Dump Replaceable Backgrounds", "استخراج الخلفيات القابلة للاستبدال"), .toggle(default: false),
+                help: DSText("Saved to Files › DuckStation › dump › textures.", "تُحفظ في: الملفات › DuckStation › dump › textures.")),
+            DSSetting("TextureReplacements", "DumpVRAMWriteForceAlphaChannel", DSText("Force Alpha Channel In Dumps", "فرض قناة الشفافية عند الاستخراج"), .toggle(default: true)),
+            DSSetting("TextureReplacements", "DumpVRAMWriteWidthThreshold", DSText("Minimum Dump Width", "أقل عرض للاستخراج"), .int(default: 128, min: 1, max: 1024, step: 16, unit: "px")),
+            DSSetting("TextureReplacements", "DumpVRAMWriteHeightThreshold", DSText("Minimum Dump Height", "أقل ارتفاع للاستخراج"), .int(default: 128, min: 1, max: 512, step: 16, unit: "px")),
+        ]),
+    ])
+
+    static let debug = DSSettingsCategory("debug", DSText("Debug", "التصحيح (Debug)"), icon: "ladybug", [
+        DSSettingsGroup(title: DSText("Debug Windows", "نوافذ التصحيح"), settings: [
+            DSSetting("Debug", "ShowVRAM", DSText("Show VRAM", "عرض ذاكرة الفيديو (VRAM)"), .toggle(default: false)),
+            DSSetting("Debug", "ShowGPUState", DSText("Show GPU State", "عرض حالة كرت الشاشة"), .toggle(default: false)),
+            DSSetting("Debug", "ShowCDROMState", DSText("Show CD-ROM State", "عرض حالة القارئ"), .toggle(default: false)),
+            DSSetting("Debug", "ShowSPUState", DSText("Show SPU State", "عرض حالة الصوت (SPU)"), .toggle(default: false)),
+            DSSetting("Debug", "ShowTimersState", DSText("Show Timers State", "عرض حالة المؤقتات"), .toggle(default: false)),
+            DSSetting("Debug", "ShowMDECState", DSText("Show MDEC State", "عرض حالة فك الفيديو (MDEC)"), .toggle(default: false)),
+            DSSetting("Debug", "ShowDMAState", DSText("Show DMA State", "عرض حالة DMA"), .toggle(default: false)),
+        ]),
+        DSSettingsGroup(title: DSText("Dumping", "الاستخراج"), settings: [
+            DSSetting("Debug", "DumpCPUToVRAMCopies", DSText("Dump CPU to VRAM Copies", "استخراج النسخ من المعالج إلى VRAM"), .toggle(default: false)),
+            DSSetting("Debug", "DumpVRAMToCPUCopies", DSText("Dump VRAM to CPU Copies", "استخراج النسخ من VRAM إلى المعالج"), .toggle(default: false)),
+        ]),
+        DSSettingsGroup(title: DSText("Logging", "السجل (Log)"), settings: [
+            DSSetting("Logging", "LogLevel", DSText("Log Level", "مستوى السجل"), .choice(default: "Info", options: [
+                DSOption("None", "None", "بدون"), DSOption("Error", "Error", "أخطاء"), DSOption("Warning", "Warning", "تحذيرات"),
+                DSOption("Info", "Info", "معلومات"), DSOption("Verbose", "Verbose", "مفصّل"), DSOption("Dev", "Dev", "مطوّر"),
+                DSOption("Debug", "Debug", "تصحيح"), DSOption("Trace", "Trace", "تتبّع كامل"),
+            ]), help: DSText("Log is saved to Files › DuckStation › duckstation.log.", "السجل يُحفظ في: الملفات › DuckStation › duckstation.log.")),
+            DSSetting("Logging", "LogTimestamps", DSText("Log Timestamps", "توقيت في السجل"), .toggle(default: true)),
+        ]),
+        DSSettingsGroup(title: DSText("GPU", "كرت الشاشة"), settings: [
+            DSSetting("GPU", "UseDebugDevice", DSText("Use Debug GPU Device", "استخدام وضع تصحيح كرت الشاشة"), .toggle(default: false)),
         ]),
     ])
 }

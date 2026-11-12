@@ -1309,7 +1309,7 @@ struct SettingsRootView: View {
         case .shaders:
             ShaderSettingsView()
         case .texturePacks:
-            TexturePacksView { TextureReplacementSettings() }
+            DSSettingsCategoryView(category: DSSettingsSchema.textures)
         case .framePacing:
             FramePacingSettingsView()
         case .audio:
