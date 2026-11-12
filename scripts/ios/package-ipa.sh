@@ -64,8 +64,15 @@ PLIST
 make_framework libshaderc_shared.dylib shaderc_shared
 make_framework libspirv-cross-c-shared.0.dylib spirv_cross_c_shared
 make_framework libsoundtouch.2.dylib soundtouch
-install_name_tool -change "@rpath/libsoundtouch.2.dylib" "@rpath/soundtouch.framework/soundtouch" "$APP/DuckStation" 2>/dev/null
-codesign --force --sign - --timestamp=none "$APP/DuckStation"
+# Patch + re-sign the executable outside the bundle (codesign would otherwise treat it as the whole app).
+EXE_TMP="$STAGE/DuckStation.exe"
+mv "$APP/DuckStation" "$EXE_TMP"
+install_name_tool -change "@rpath/libsoundtouch.2.dylib" "@rpath/soundtouch.framework/soundtouch" "$EXE_TMP" 2>/dev/null
+if ! otool -l "$EXE_TMP" | grep -q "@executable_path/Frameworks"; then
+  install_name_tool -add_rpath "@executable_path/Frameworks" "$EXE_TMP"
+fi
+codesign --force --sign - --timestamp=none "$EXE_TMP"
+mv "$EXE_TMP" "$APP/DuckStation"
 
 # App icons
 cp "$ROOT_DIR"/scripts/ios/icons/AppIcon*.png "$APP/"
@@ -74,10 +81,6 @@ rm -f "$APP/AppIcon1024.png"
 # Strip extended attributes (quarantine etc.) so the archive is clean.
 xattr -cr "$APP" || true
 
-# Make sure the executable finds them.
-if ! otool -l "$APP/DuckStation" | grep -q "@executable_path/Frameworks"; then
-  install_name_tool -add_rpath "@executable_path/Frameworks" "$APP/DuckStation"
-fi
 
 VERSION="$(git -C "$ROOT_DIR" rev-list --count HEAD 2>/dev/null || echo 1)"
 SDK_VERSION="$(xcrun --sdk iphoneos --show-sdk-version)"
