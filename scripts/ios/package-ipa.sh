@@ -26,8 +26,10 @@ fi
 cp "$METALLIB" "$APP/Metal23.metallib"
 
 # Core resources (fonts, shaders, game database, ...)
-cp -R "$ROOT_DIR/data/resources" "$APP/resources"
-find "$APP/resources" -name '.DS_Store' -delete
+# Must NOT be named "resources" (case-insensitively): a top-level Resources dir makes iOS treat the app as an
+# old-style bundle and fail to read Info.plist (unknown name/icon, failed installs).
+cp -R "$ROOT_DIR/data/resources" "$APP/dsdata"
+find "$APP/dsdata" -name '.DS_Store' -delete
 
 # Runtime libraries, packaged as .framework bundles like an Xcode app (no loose .dylib files).
 #  - shaderc_shared / spirv_cross_c_shared are dlopen()ed by the Metal backend (see DynamicLibrary on iOS)

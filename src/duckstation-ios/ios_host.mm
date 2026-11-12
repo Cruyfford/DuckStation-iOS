@@ -99,7 +99,8 @@ bool IOSHost::Initialize(const std::string& documents_dir, const std::string& bu
 
   EmuFolders::AppRoot = bundle_dir;
   EmuFolders::DataRoot = documents_dir;
-  EmuFolders::Resources = Path::Combine(bundle_dir, "resources");
+  // Not "resources": a top-level Resources folder makes CFBundle/installd treat the .app as an old-style bundle.
+  EmuFolders::Resources = Path::Combine(bundle_dir, "dsdata");
   EmuFolders::SetDefaults();
   EmuFolders::Bios = Path::Combine(documents_dir, "BIOS");
   s_games_dir = Path::Combine(documents_dir, "Games");
