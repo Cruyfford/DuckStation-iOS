@@ -6,6 +6,9 @@ on:
   pull_request:
   workflow_dispatch:
 
+permissions:
+  contents: write
+
 jobs:
   build:
     runs-on: macos-15
@@ -68,3 +71,17 @@ jobs:
         with:
           name: DuckStation-iOS
           path: out/DuckStation.ipa
+
+      # Keep the latest IPA on the private 'builds' branch so it can be fetched with git.
+      - name: Publish IPA to builds branch
+        if: github.event_name != 'pull_request'
+        run: |
+          set -e
+          mkdir -p /tmp/builds && cp out/DuckStation.ipa /tmp/builds/DuckStation.ipa
+          cd /tmp/builds
+          git init -q -b builds
+          git config user.name "github-actions"
+          git config user.email "github-actions@users.noreply.github.com"
+          echo "Built from ${GITHUB_SHA}" > BUILD.txt
+          git add -A && git commit -qm "DuckStation.ipa from ${GITHUB_SHA}"
+          git push -f "https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${GITHUB_REPOSITORY}.git" builds
