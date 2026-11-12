@@ -97,7 +97,7 @@ echo "::endgroup::"
 
 echo "::group::libjpeg-turbo"
 rm -fr "libjpeg-turbo-$LIBJPEGTURBO" && tar xf "libjpeg-turbo-$LIBJPEGTURBO.tar.gz" && cd "libjpeg-turbo-$LIBJPEGTURBO"
-cmake "${CMAKE_COMMON[@]}" -DENABLE_STATIC=ON -DENABLE_SHARED=OFF -DWITH_SIMD=OFF -DWITH_TURBOJPEG=OFF -B build-ios
+cmake "${CMAKE_COMMON[@]}" -DCMAKE_SYSTEM_PROCESSOR=aarch64 -DENABLE_STATIC=ON -DENABLE_SHARED=OFF -DWITH_SIMD=OFF -DWITH_TURBOJPEG=OFF -B build-ios
 cmake --build build-ios --parallel "$NPROCS" && cmake --install build-ios
 cd ..
 echo "::endgroup::"
