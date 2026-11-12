@@ -583,11 +583,13 @@ struct OverlayButton
       break;
 
     case IOSHost::Event::Error:
+    {
       ShowAlert(self, L(@"error"), message, ^{
         if (!IOSHost::IsSystemActive())
           [self close];
       });
       break;
+    }
 
     default:
       break;
