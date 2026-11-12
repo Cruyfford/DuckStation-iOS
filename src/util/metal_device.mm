@@ -157,8 +157,10 @@ void MetalDevice::SetVSyncMode(GPUVSyncMode mode, bool allow_present_throttle)
     return;
 
   m_vsync_mode = mode;
+#ifndef DUCKSTATION_IOS
   if (m_layer != nil)
     [m_layer setDisplaySyncEnabled:m_vsync_mode == GPUVSyncMode::FIFO];
+#endif
 }
 
 bool MetalDevice::CreateDevice(std::string_view adapter, bool threaded_presentation,
@@ -410,15 +412,24 @@ bool MetalDevice::CreateLayer()
 
         VERBOSE_LOG("Metal layer pixel format is {}.", GPUTexture::GetFormatName(m_window_info.surface_format));
 
+#ifdef DUCKSTATION_IOS
+        UIView* view = GetWindowView();
+        [m_layer setFrame:[view bounds]];
+        [m_layer setContentsScale:[[view window] screen] ? [[[view window] screen] nativeScale] : [[UIScreen mainScreen] nativeScale]];
+        [[view layer] addSublayer:m_layer];
+#else
         NSView* view = GetWindowView();
         [view setWantsLayer:TRUE];
         [view setLayer:m_layer];
+#endif
       }
     });
 
     // Metal does not support mailbox mode.
     m_vsync_mode = (m_vsync_mode == GPUVSyncMode::Mailbox) ? GPUVSyncMode::FIFO : m_vsync_mode;
+#ifndef DUCKSTATION_IOS
     [m_layer setDisplaySyncEnabled:m_vsync_mode == GPUVSyncMode::FIFO];
+#endif
 
     DebugAssert(m_layer_pass_desc == nil);
     m_layer_pass_desc = [[MTLRenderPassDescriptor renderPassDescriptor] retain];
@@ -444,9 +455,13 @@ void MetalDevice::DestroyLayer()
   m_window_info.surface_format = GPUTexture::Format::Unknown;
 
   RunOnMainThread([this]() {
+#ifdef DUCKSTATION_IOS
+    [m_layer removeFromSuperlayer];
+#else
     NSView* view = GetWindowView();
     [view setLayer:nil];
     [view setWantsLayer:FALSE];
+#endif
     [m_layer release];
     m_layer = nullptr;
   });

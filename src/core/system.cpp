@@ -89,7 +89,7 @@ Log_SetChannel(System);
 #include <objbase.h>
 #endif
 
-#ifndef __ANDROID__
+#if !defined(__ANDROID__) && !defined(DUCKSTATION_IOS)
 #define ENABLE_DISCORD_PRESENCE 1
 #define ENABLE_PINE_SERVER 1
 #define ENABLE_GDB_SERVER 1

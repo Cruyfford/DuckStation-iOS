@@ -91,7 +91,9 @@ public:
   static constexpr u32 NUM_CHANNELS = 2;
   static constexpr u32 CHUNK_SIZE = 64;
 
-#ifndef __ANDROID__
+#if defined(DUCKSTATION_IOS)
+  static constexpr AudioBackend DEFAULT_BACKEND = AudioBackend::SDL;
+#elif !defined(__ANDROID__)
   static constexpr AudioBackend DEFAULT_BACKEND = AudioBackend::Cubeb;
 #else
   static constexpr AudioBackend DEFAULT_BACKEND = AudioBackend::AAudio;

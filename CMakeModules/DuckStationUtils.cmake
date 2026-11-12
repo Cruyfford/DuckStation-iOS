@@ -19,6 +19,8 @@ function(detect_operating_system)
 
 	if(WIN32)
 		message(STATUS "Building for Windows.")
+	elseif(IOS)
+		message(STATUS "Building for iOS.")
 	elseif(APPLE AND NOT IOS)
 		message(STATUS "Building for MacOS.")
 	elseif(LINUX)

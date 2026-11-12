@@ -174,6 +174,10 @@ void Settings::Load(SettingsInterface& si, SettingsInterface& controller_si)
     ParseCPUExecutionMode(
       si.GetStringValue("CPU", "ExecutionMode", GetCPUExecutionModeName(DEFAULT_CPU_EXECUTION_MODE)).c_str())
       .value_or(DEFAULT_CPU_EXECUTION_MODE);
+#ifdef DUCKSTATION_IOS
+  if (cpu_execution_mode == CPUExecutionMode::Recompiler || cpu_execution_mode == CPUExecutionMode::NewRec)
+    cpu_execution_mode = CPUExecutionMode::CachedInterpreter;
+#endif
   cpu_overclock_numerator = std::max(si.GetIntValue("CPU", "OverclockNumerator", 1), 1);
   cpu_overclock_denominator = std::max(si.GetIntValue("CPU", "OverclockDenominator", 1), 1);
   cpu_overclock_enable = si.GetBoolValue("CPU", "OverclockEnable", false);

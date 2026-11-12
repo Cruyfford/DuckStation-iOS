@@ -110,7 +110,11 @@ bool DynamicLibrary::Open(const char* filename, Error* error)
       std::optional<std::string> bundle_path = CocoaTools::GetBundlePath();
       if (bundle_path.has_value())
       {
+#ifdef DUCKSTATION_IOS
+        std::string frameworks_path = fmt::format("{}/Frameworks/{}", bundle_path.value(), filename);
+#else
         std::string frameworks_path = fmt::format("{}/Contents/Frameworks/{}", bundle_path.value(), filename);
+#endif
         if (FileSystem::FileExists(frameworks_path.c_str()))
         {
           m_handle = dlopen(frameworks_path.c_str(), RTLD_NOW);

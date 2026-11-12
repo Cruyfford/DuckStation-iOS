@@ -239,17 +239,25 @@ elseif(APPLE)
     metal_layer.h
     metal_stream_buffer.h
     metal_stream_buffer.mm
-    platform_misc_mac.mm
   )
+  if(IOS)
+    list(APPEND MAC_SOURCES platform_misc_ios.mm http_downloader_ios.cpp)
+  else()
+    list(APPEND MAC_SOURCES platform_misc_mac.mm)
+  endif()
   set(METAL_SOURCES
     "${CMAKE_CURRENT_SOURCE_DIR}/metal_shaders.metal"
   )
   set_property(GLOBAL PROPERTY UTIL_METAL_SOURCES ${METAL_SOURCES})
   target_sources(util PRIVATE ${MAC_SOURCES})
-  find_library(IOK_LIBRARY IOKit REQUIRED)
-  find_library(METAL_LIBRARY Metal)
-  find_library(QUARTZCORE_LIBRARY QuartzCore)
-  target_link_libraries(util PRIVATE ${METAL_LIBRARY} ${QUARTZCORE_LIBRARY} ${IOK_LIBRARY})
+  if(IOS)
+    target_link_libraries(util PRIVATE "-framework Metal" "-framework QuartzCore" "-framework UIKit")
+  else()
+    find_library(IOK_LIBRARY IOKit REQUIRED)
+    find_library(METAL_LIBRARY Metal)
+    find_library(QUARTZCORE_LIBRARY QuartzCore)
+    target_link_libraries(util PRIVATE ${METAL_LIBRARY} ${QUARTZCORE_LIBRARY} ${IOK_LIBRARY})
+  endif()
   set_source_files_properties(${MAC_SOURCES} PROPERTIES SKIP_PRECOMPILE_HEADERS TRUE)
 elseif(NOT ANDROID)
   target_sources(util PRIVATE
@@ -265,7 +273,7 @@ elseif(NOT ANDROID)
   endif()
 endif()
 
-if(NOT WIN32 AND NOT ANDROID)
+if(NOT WIN32 AND NOT ANDROID AND NOT IOS)
   target_sources(util PRIVATE
     http_downloader_curl.cpp
     http_downloader_curl.h
@@ -279,6 +287,8 @@ function(add_util_resources target)
   if(APPLE)
     get_property(UTIL_METAL_SOURCES GLOBAL PROPERTY UTIL_METAL_SOURCES)
     add_metal_sources(${target} ${UTIL_METAL_SOURCES})
+  endif()
+  if(APPLE AND NOT IOS)
 
     # Copy MoltenVK into the bundle
     unset(MOLTENVK_PATH CACHE)

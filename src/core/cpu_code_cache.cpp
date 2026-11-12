@@ -179,6 +179,14 @@ bool CPU::CodeCache::IsUsingFastmem()
 
 bool CPU::CodeCache::ProcessStartup(Error* error)
 {
+#ifdef DUCKSTATION_IOS
+  // iOS does not allow executable memory without a JIT entitlement or an attached debugger.
+  // Only the (cached) interpreter is used, so the recompiler code buffer and fastmem fault handler are skipped.
+  s_code_buffer_ptr = nullptr;
+  AllocateLUTs();
+  return true;
+#endif
+
 #ifdef USE_CODE_BUFFER_SECTION
   const u8* module_base = static_cast<const u8*>(MemMap::GetBaseAddress());
   INFO_LOG("Using JIT buffer section of size {} at {} (0x{:X} bytes / {} MB away)", sizeof(s_code_buffer_ptr),
@@ -209,7 +217,7 @@ void CPU::CodeCache::ProcessShutdown()
 {
   DeallocateLUTs();
 
-#ifndef USE_CODE_BUFFER_SECTION
+#if !defined(USE_CODE_BUFFER_SECTION) && !defined(DUCKSTATION_IOS)
   MemMap::ReleaseJITMemory(s_code_buffer_ptr, RECOMPILER_CODE_CACHE_SIZE);
 #endif
 }

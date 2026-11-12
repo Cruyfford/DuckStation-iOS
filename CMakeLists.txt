@@ -108,6 +108,10 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DFMT_EXCEPTIONS=0")
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
+if(IOS)
+  add_compile_definitions(DUCKSTATION_IOS=1)
+endif()
+
 # Recursively include the source tree.
 include(DuckStationDependencies)
 add_subdirectory(dep)

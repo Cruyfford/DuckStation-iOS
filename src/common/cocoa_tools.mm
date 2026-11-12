@@ -49,6 +49,7 @@ bool CocoaTools::MoveFile(const char *source, const char *destination, Error *er
 }
 
 
+#ifndef DUCKSTATION_IOS
 // From https://github.com/PCSX2/pcsx2/blob/8d27c324187140df0c5a42f3a501b5d76b1215f5/common/CocoaTools.mm
 
 @interface PCSX2KVOHelper : NSObject
@@ -107,6 +108,18 @@ void CocoaTools::RemoveThemeChangeHandler(void* ctx)
   [s_themeChangeHandler removeCallback:ctx];
 }
 
+#else // DUCKSTATION_IOS
+
+void CocoaTools::AddThemeChangeHandler(void* ctx, void(handler)(void* ctx))
+{
+}
+
+void CocoaTools::RemoveThemeChangeHandler(void* ctx)
+{
+}
+
+#endif // DUCKSTATION_IOS
+
 std::optional<std::string> CocoaTools::GetBundlePath()
 {
   std::optional<std::string> ret;
@@ -120,6 +133,9 @@ std::optional<std::string> CocoaTools::GetBundlePath()
 
 std::optional<std::string> CocoaTools::GetNonTranslocatedBundlePath()
 {
+#ifdef DUCKSTATION_IOS
+  return GetBundlePath();
+#else
   // See https://objective-see.com/blog/blog_0x15.html
 
   NSURL* url = [NSURL fileURLWithPath:[[NSBundle mainBundle] bundlePath]];
@@ -142,10 +158,14 @@ std::optional<std::string> CocoaTools::GetNonTranslocatedBundlePath()
   }
 
   return std::string([url fileSystemRepresentation]);
+#endif
 }
 
 bool CocoaTools::DelayedLaunch(std::string_view file, std::span<const std::string_view> args)
 {
+#ifdef DUCKSTATION_IOS
+  return false;
+#else
   @autoreleasepool {
     const int pid = [[NSProcessInfo processInfo] processIdentifier];
     
@@ -167,4 +187,5 @@ bool CocoaTools::DelayedLaunch(std::string_view file, std::span<const std::strin
     [task setArguments:@[@"-c", [NSString stringWithUTF8String:task_args.c_str()]]];
     return [task launchAndReturnError:nil];
   }
+#endif
 }

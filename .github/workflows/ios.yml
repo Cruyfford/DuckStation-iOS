@@ -1,0 +1,61 @@
+name: iOS IPA
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: macos-15
+    timeout-minutes: 120
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Select Xcode
+        run: |
+          sudo xcode-select -s "$(ls -d /Applications/Xcode_16*.app | sort -V | tail -n 1)"
+          xcodebuild -version
+
+      - name: Install build tools
+        run: brew install ninja || true
+
+      - name: Cache dependencies
+        id: cache-deps
+        uses: actions/cache@v4
+        with:
+          path: deps-ios
+          key: deps-ios-${{ hashFiles('scripts/deps/build-dependencies-ios.sh') }}
+
+      - name: Build dependencies
+        if: steps.cache-deps.outputs.cache-hit != 'true'
+        run: bash scripts/deps/build-dependencies-ios.sh "$PWD/deps-ios"
+
+      - name: Configure
+        run: |
+          cmake -G Ninja -B build \
+            -DCMAKE_BUILD_TYPE=Release \
+            -DCMAKE_SYSTEM_NAME=iOS \
+            -DCMAKE_OSX_ARCHITECTURES=arm64 \
+            -DCMAKE_OSX_DEPLOYMENT_TARGET=15.0 \
+            -DCMAKE_PREFIX_PATH="$PWD/deps-ios" \
+            -DCMAKE_FIND_ROOT_PATH="$PWD/deps-ios" \
+            -DCMAKE_FIND_ROOT_PATH_MODE_PACKAGE=BOTH \
+            -DCMAKE_FIND_ROOT_PATH_MODE_LIBRARY=BOTH \
+            -DCMAKE_FIND_ROOT_PATH_MODE_INCLUDE=BOTH \
+            -DCMAKE_MACOSX_BUNDLE=OFF \
+            -DBUILD_IOS_FRONTEND=ON
+
+      - name: Build
+        run: cmake --build build --parallel "$(sysctl -n hw.ncpu)"
+
+      - name: Package IPA
+        run: bash scripts/ios/package-ipa.sh build deps-ios out/DuckStation.ipa
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: DuckStation-iOS
+          path: out/DuckStation.ipa

@@ -1138,7 +1138,7 @@ bool CDImage::IsDeviceName(const char* filename)
   return is_cdrom;
 }
 
-#elif defined(__APPLE__)
+#elif defined(__APPLE__) && !defined(DUCKSTATION_IOS)
 
 #include <CoreFoundation/CoreFoundation.h>
 #include <IOKit/IOBSD.h>

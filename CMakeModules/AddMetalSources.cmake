@@ -1,6 +1,11 @@
 # Borrowed from PCSX2.
 
 if(APPLE)
+  if(IOS)
+    set(METAL_SDK iphoneos)
+  else()
+    set(METAL_SDK macosx)
+  endif()
   function(add_metal_sources target sources)
     if(CMAKE_GENERATOR MATCHES "Xcode")
       # If we're generating an xcode project, you can just add the shaders to the main pcsx2 target and xcode will deal with them properly
@@ -27,21 +32,25 @@ if(APPLE)
           get_filename_component(shaderDir ${shaderOut} DIRECTORY)
           add_custom_command(OUTPUT ${shaderOut}
             COMMAND ${CMAKE_COMMAND} -E make_directory ${shaderDir}
-            COMMAND xcrun metal ${flags} -std=${std} -target ${triple} -o ${shaderOut} -c ${shader}
+            COMMAND xcrun -sdk ${METAL_SDK} metal ${flags} -std=${std} -target ${triple} -o ${shaderOut} -c ${shader}
             DEPENDS ${shader}
           )
           set(metallib ${CMAKE_CURRENT_BINARY_DIR}/${outputName}.metallib)
         endforeach()
         add_custom_command(OUTPUT ${metallib}
-          COMMAND xcrun metallib -o ${metallib} ${MetalShaderOut}
+          COMMAND xcrun -sdk ${METAL_SDK} metallib -o ${metallib} ${MetalShaderOut}
           DEPENDS ${MetalShaderOut}
         )
         target_sources(${target} PRIVATE ${metallib})
         set_source_files_properties(${metallib} PROPERTIES MACOSX_PACKAGE_LOCATION Resources)
       endfunction()
-      generateMetallib(macos-metal2.0 air64-apple-macos10.13 default)
-      generateMetallib(macos-metal2.2 air64-apple-macos10.15 Metal22)
-      generateMetallib(macos-metal2.3 air64-apple-macos11.0  Metal23)
+      if(IOS)
+        generateMetallib(ios-metal2.3 air64-apple-ios14.0 Metal23)
+      else()
+        generateMetallib(macos-metal2.0 air64-apple-macos10.13 default)
+        generateMetallib(macos-metal2.2 air64-apple-macos10.15 Metal22)
+        generateMetallib(macos-metal2.3 air64-apple-macos11.0  Metal23)
+      endif()
     endif()  
   endfunction()
 endif()

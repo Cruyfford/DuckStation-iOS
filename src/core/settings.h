@@ -473,7 +473,9 @@ struct Settings
   static constexpr float GPU_PGXP_DEPTH_THRESHOLD_SCALE = 4096.0f;
 
   // Prefer oldrec over newrec for now. Except on RISC-V, where there is no oldrec.
-#if defined(CPU_ARCH_RISCV64)
+#if defined(DUCKSTATION_IOS)
+  static constexpr CPUExecutionMode DEFAULT_CPU_EXECUTION_MODE = CPUExecutionMode::CachedInterpreter;
+#elif defined(CPU_ARCH_RISCV64)
   static constexpr CPUExecutionMode DEFAULT_CPU_EXECUTION_MODE = CPUExecutionMode::NewRec;
 #else
   static constexpr CPUExecutionMode DEFAULT_CPU_EXECUTION_MODE = CPUExecutionMode::Recompiler;

@@ -18,11 +18,25 @@ find_package(JPEG REQUIRED)
 find_package(Freetype 2.13.2 REQUIRED) # 2.13.3, but flatpak is still on 2.13.2.
 find_package(lunasvg 2.4.1 REQUIRED)
 find_package(cpuinfo REQUIRED)
-find_package(DiscordRPC 3.4.0 REQUIRED)
+if(NOT IOS)
+  find_package(DiscordRPC 3.4.0 REQUIRED)
+endif()
 find_package(SoundTouch 2.3.3 REQUIRED)
 
-if(NOT WIN32)
+if(NOT WIN32 AND NOT IOS)
   find_package(CURL REQUIRED)
+endif()
+
+if(IOS)
+  # Metal backend still needs shaderc + spirv-cross (loaded at runtime from the app's Frameworks folder).
+  find_package(Shaderc REQUIRED)
+  find_package(spirv_cross_c_shared REQUIRED)
+
+  # SDL2 is built statically for iOS; expose it under the name the rest of the build expects.
+  if(NOT TARGET SDL2::SDL2 AND TARGET SDL2::SDL2-static)
+    add_library(SDL2::SDL2 INTERFACE IMPORTED)
+    set_target_properties(SDL2::SDL2 PROPERTIES INTERFACE_LINK_LIBRARIES SDL2::SDL2-static)
+  endif()
 endif()
 
 if(ENABLE_X11)
@@ -61,7 +75,7 @@ if(NOT WIN32 AND NOT APPLE)
   find_package(Libbacktrace REQUIRED)
 endif()
 
-if(NOT ANDROID AND NOT WIN32)
+if(NOT ANDROID AND NOT WIN32 AND NOT IOS)
   find_package(FFMPEG COMPONENTS avcodec avformat avutil swresample swscale)
   if(NOT FFMPEG_FOUND)
     message(WARNING "FFmpeg not found, using bundled headers.")

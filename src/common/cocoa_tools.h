@@ -9,8 +9,12 @@
 class Error;
 
 #ifdef __OBJC__
+#ifdef DUCKSTATION_IOS
+#import <Foundation/Foundation.h>
+#else
 #import <AppKit/AppKit.h>
 #import <Cocoa/Cocoa.h>
+#endif
 
 namespace CocoaTools {
 NSString* StringViewToNSString(std::string_view str);

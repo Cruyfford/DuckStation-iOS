@@ -3,8 +3,12 @@ add_subdirectory(util)
 add_subdirectory(core)
 add_subdirectory(scmversion)
 
-if(WIN32 OR APPLE)
+if(WIN32 OR (APPLE AND NOT IOS))
   add_subdirectory(updater)
+endif()
+
+if(BUILD_IOS_FRONTEND)
+  add_subdirectory(duckstation-ios)
 endif()
 
 if(BUILD_NOGUI_FRONTEND)

@@ -4,7 +4,11 @@
 #pragma once
 
 // Macro hell. These have to come first.
+#ifdef DUCKSTATION_IOS
+#include <UIKit/UIKit.h>
+#else
 #include <AppKit/AppKit.h>
+#endif
 #include <Metal/Metal.h>
 #include <QuartzCore/QuartzCore.h>
 
@@ -315,7 +319,11 @@ private:
   };
   static_assert(sizeof(ClearPipelineConfig) == 8);
 
+#ifdef DUCKSTATION_IOS
+  ALWAYS_INLINE UIView* GetWindowView() const { return (__bridge UIView*)m_window_info.window_handle; }
+#else
   ALWAYS_INLINE NSView* GetWindowView() const { return (__bridge NSView*)m_window_info.window_handle; }
+#endif
 
   void SetFeatures(FeatureMask disabled_features);
   bool LoadShaders();
