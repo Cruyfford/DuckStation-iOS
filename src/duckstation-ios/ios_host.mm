@@ -125,6 +125,10 @@ bool IOSHost::Initialize(const std::string& documents_dir, const std::string& bu
     s_settings->Save();
   }
 
+  // Keep a log in Documents (visible in the Files app) so boot problems can be diagnosed on-device.
+  s_settings->SetBoolValue("Logging", "LogToFile", true);
+  Log::SetFileOutputParams(true, Path::Combine(documents_dir, "duckstation.log").c_str(), true);
+
   // Folders always live in Documents, even if the stored config points elsewhere.
   EmuFolders::LoadConfig(*s_settings);
   EmuFolders::Bios = Path::Combine(documents_dir, "BIOS");
