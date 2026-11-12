@@ -1,12 +1,12 @@
 # Borrowed from PCSX2.
 
 if(APPLE)
-  if(IOS)
-    set(METAL_SDK iphoneos)
-  else()
-    set(METAL_SDK macosx)
-  endif()
   function(add_metal_sources target sources)
+    if(IOS)
+      set(METAL_SDK iphoneos)
+    else()
+      set(METAL_SDK macosx)
+    endif()
     if(CMAKE_GENERATOR MATCHES "Xcode")
       # If we're generating an xcode project, you can just add the shaders to the main pcsx2 target and xcode will deal with them properly
       # This will make sure xcode supplies code completion, etc (if you use a custom command, it won't)
