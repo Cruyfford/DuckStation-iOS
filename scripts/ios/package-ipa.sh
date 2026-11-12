@@ -91,8 +91,16 @@ EOF
 plutil -lint "$APP/Info.plist"
 
 # Ad-hoc sign so the bundle is well-formed; the sideloading tool re-signs it with your Apple ID.
-codesign --force --sign - --timestamp=none "$APP/Frameworks/"*.dylib || true
-codesign --force --sign - --timestamp=none "$APP" || true
+codesign --force --sign - --timestamp=none "$APP/Frameworks/"*.dylib
+codesign --force --sign - --timestamp=none "$APP/Metal23.metallib"
+codesign --force --sign - --timestamp=none "$APP"
+codesign --verify --deep --strict "$APP"
+
+echo "== Bundle contents =="
+ls -la "$APP" "$APP/Frameworks"
+echo "== Linked libraries =="
+otool -L "$APP/DuckStation"
+otool -l "$APP/DuckStation" | grep -A2 LC_RPATH || true
 
 mkdir -p "$(dirname "$OUT_IPA")"
 OUT_ABS="$(cd "$(dirname "$OUT_IPA")" && pwd)/$(basename "$OUT_IPA")"
