@@ -4023,7 +4023,7 @@ struct GameListView: View {
         GameLibrarySnapshot.shared.markLibraryRefreshNeeded()
         scheduleLibraryReload(
             after: .milliseconds(120),
-            autoDownloadExternalCovers: false
+            autoDownloadExternalCovers: true
         )
     }
 
@@ -8928,7 +8928,6 @@ struct GameListView: View {
 		guard appState.runningGameName == nil else { return }
 
 		let targets = games.filter { game in
-			game.isExternal &&
 			game.coverURL == nil &&
 			!externalCoverAutoDownloadAttemptedIDs.contains(game.id)
 		}

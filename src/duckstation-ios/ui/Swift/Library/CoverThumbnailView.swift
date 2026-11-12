@@ -36,7 +36,7 @@ struct CoverThumbnailView: View {
                 VStack(spacing: 6) {
                     Image(systemName: gameName.lowercased().hasSuffix(".chd") ? "archivebox" : "opticaldisc")
                         .font(.system(size: 24, weight: .medium))
-                    Text(gameName.lowercased().hasSuffix(".chd") ? "CHD" : "PS2")
+                    Text(gameName.lowercased().hasSuffix(".chd") ? "CHD" : "PS1")
                         .font(.caption2)
                         .fontWeight(.bold)
                 }

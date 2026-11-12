@@ -30,7 +30,7 @@ struct CoverDownloadSummary: Sendable {
 final class CoverStore {
     static let shared = CoverStore()
 
-    static let defaultCoverURLTemplate = "https://raw.githubusercontent.com/xlenore/ps2-covers/main/covers/default/${serial}.jpg"
+    static let defaultCoverURLTemplate = "https://raw.githubusercontent.com/xlenore/psx-covers/main/covers/default/${serial}.jpg"
 
     static let imageExtensions: [String] = ["jpg", "jpeg", "png", "webp", "heic", "heif"]
     static let coverContentTypes: [UTType] = {
@@ -50,7 +50,9 @@ final class CoverStore {
     var coverURLTemplate: String {
         get {
             let stored = UserDefaults.standard.string(forKey: "ARMSX2iOSCoverURLTemplate")
-            return stored?.isEmpty == false ? stored! : Self.defaultCoverURLTemplate
+            // Older builds saved the PS2 cover source; PS1 games need the PSX set.
+            guard let stored, !stored.isEmpty, !stored.contains("ps2-covers") else { return Self.defaultCoverURLTemplate }
+            return stored
         }
         set {
             UserDefaults.standard.set(newValue.trimmingCharacters(in: .whitespacesAndNewlines), forKey: "ARMSX2iOSCoverURLTemplate")

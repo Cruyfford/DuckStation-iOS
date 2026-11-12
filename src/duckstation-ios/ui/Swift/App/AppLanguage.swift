@@ -126,6 +126,7 @@ enum AppLanguage: String, CaseIterable, Identifiable {
             .replacingOccurrences(of: "PS2 BIOS", with: "PS1 BIOS")
             .replacingOccurrences(of: "PS2 disc", with: "PS1 disc")
             .replacingOccurrences(of: "PlayStation 2", with: "PlayStation")
+            .replacingOccurrences(of: "PS2", with: "PS1")
     }
 
 }
