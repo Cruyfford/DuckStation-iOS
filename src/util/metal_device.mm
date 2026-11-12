@@ -19,6 +19,13 @@
 #include <array>
 #include <pthread.h>
 
+// Render-target barriers are only used on non-Apple-GPU Macs; iOS just needs this to compile.
+#ifdef DUCKSTATION_IOS
+#define DS_RT_BARRIER_SCOPE MTLBarrierScopeTextures
+#else
+#define DS_RT_BARRIER_SCOPE MTLBarrierScopeRenderTargets
+#endif
+
 Log_SetChannel(MetalDevice);
 
 // TODO: Disable hazard tracking and issue barriers explicitly.
@@ -39,7 +46,11 @@ static constexpr std::array<MTLPixelFormat, static_cast<u32>(GPUTexture::Format:
   MTLPixelFormatA1BGR5Unorm,  // RGBA5551
   MTLPixelFormatR8Unorm,      // R8
   MTLPixelFormatDepth16Unorm, // D16
+#ifdef DUCKSTATION_IOS
+  MTLPixelFormatDepth32Float_Stencil8, // D24S8 (no D24S8 on iOS)
+#else
   MTLPixelFormatDepth24Unorm_Stencil8, // D24S8
+#endif
   MTLPixelFormatDepth32Float, // D32F
   MTLPixelFormatDepth32Float_Stencil8, // D32FS8
   MTLPixelFormatR16Unorm,     // R16
@@ -2223,7 +2234,7 @@ void MetalDevice::DrawIndexedWithBarrier(u32 index_count, u32 base_index, u32 ba
       if (!skip_first_barrier)
       {
         s_stats.num_barriers++;
-        [m_render_encoder memoryBarrierWithScope:MTLBarrierScopeRenderTargets
+        [m_render_encoder memoryBarrierWithScope:DS_RT_BARRIER_SCOPE
                                      afterStages:MTLRenderStageFragment
                                     beforeStages:MTLRenderStageFragment];
       }
@@ -2261,7 +2272,7 @@ void MetalDevice::DrawIndexedWithBarrier(u32 index_count, u32 base_index, u32 ba
       if (!skip_first_barrier)
       {
         s_stats.num_barriers++;
-        [m_render_encoder memoryBarrierWithScope:MTLBarrierScopeRenderTargets
+        [m_render_encoder memoryBarrierWithScope:DS_RT_BARRIER_SCOPE
                                      afterStages:MTLRenderStageFragment
                                     beforeStages:MTLRenderStageFragment];
       }
@@ -2283,7 +2294,7 @@ void MetalDevice::DrawIndexedWithBarrier(u32 index_count, u32 base_index, u32 ba
         s_stats.num_barriers++;
         s_stats.num_draws++;
 
-        [m_render_encoder memoryBarrierWithScope:MTLBarrierScopeRenderTargets
+        [m_render_encoder memoryBarrierWithScope:DS_RT_BARRIER_SCOPE
                                      afterStages:MTLRenderStageFragment
                                     beforeStages:MTLRenderStageFragment];
         [m_render_encoder drawIndexedPrimitives:m_current_pipeline->GetPrimitive()
