@@ -110,6 +110,8 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 if(IOS)
   add_compile_definitions(DUCKSTATION_IOS=1)
+  # Xcode 26's clang rejects fmt 10.1's consteval format-string checks; compile them as runtime checks.
+  add_compile_definitions("FMT_CONSTEVAL=")
 endif()
 
 # Recursively include the source tree.
