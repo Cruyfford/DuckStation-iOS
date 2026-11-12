@@ -35,6 +35,8 @@ add_executable(duckstation-ios ${OBJC_SOURCES} ios_host.h ${SWIFT_SOURCES})
 set_target_properties(duckstation-ios PROPERTIES
   OUTPUT_NAME "DuckStation"
   Swift_MODULE_NAME "DuckStation"
+  # One object per Swift file, which the clang++ link step below expects.
+  Swift_COMPILATION_MODE "incremental"
   BUILD_RPATH "@executable_path/Frameworks"
   INSTALL_RPATH "@executable_path/Frameworks"
 )
@@ -49,6 +51,7 @@ target_include_directories(duckstation-ios PRIVATE "${UI_DIR}/Bridge" "${CMAKE_C
 # Swift: language mode 6 like ARMSX2, ObjC bridge exposed through the bridging header.
 target_compile_options(duckstation-ios PRIVATE
   "$<$<COMPILE_LANGUAGE:Swift>:SHELL:-swift-version 6>"
+  "$<$<COMPILE_LANGUAGE:Swift>:-O>"
   "$<$<COMPILE_LANGUAGE:Swift>:SHELL:-import-objc-header ${UI_DIR}/Bridge/ARMSX2-Bridging-Header.h>"
   "$<$<COMPILE_LANGUAGE:Swift>:SHELL:-Xcc -I${UI_DIR}/Bridge>"
 )
