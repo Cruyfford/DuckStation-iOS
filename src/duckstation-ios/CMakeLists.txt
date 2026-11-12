@@ -1,27 +1,76 @@
-# iOS frontend. Builds a plain executable; scripts/ios/package-ipa.sh assembles the .app/.ipa around it.
+# iOS frontend: the ARMSX2 SwiftUI interface (GPL-3.0, see ui/COPYING.GPLv3 and ui/ARMSX2_COMMIT)
+# driving DuckStation through ui/Bridge/DSBridge.mm. Builds a plain executable; scripts/ios/package-ipa.sh
+# assembles the .app/.ipa (assets, asset catalog, localizations) around it.
 
-add_executable(duckstation-ios
-  ios_app.mm
-  ios_host.h
-  ios_host.mm
+enable_language(Swift)
+
+set(UI_DIR "${CMAKE_CURRENT_SOURCE_DIR}/ui")
+
+file(GLOB_RECURSE SWIFT_SOURCES CONFIGURE_DEPENDS "${UI_DIR}/Swift/*.swift")
+if(NOT SWIFT_SOURCES)
+  message(FATAL_ERROR "No Swift sources found in ${UI_DIR}/Swift")
+endif()
+
+# Every ARMSX2Bridge method DSBridge.mm doesn't implement gets a generated default.
+find_package(Python3 REQUIRED COMPONENTS Interpreter)
+set(BRIDGE_STUBS "${CMAKE_CURRENT_BINARY_DIR}/ARMSX2Bridge+Stubs.mm")
+add_custom_command(
+  OUTPUT "${BRIDGE_STUBS}"
+  COMMAND "${Python3_EXECUTABLE}" "${PROJECT_SOURCE_DIR}/scripts/ios/gen_bridge_stubs.py"
+          "${UI_DIR}/Bridge/ARMSX2Bridge.h" "${UI_DIR}/Bridge/DSBridge.mm" "${BRIDGE_STUBS}"
+  DEPENDS "${PROJECT_SOURCE_DIR}/scripts/ios/gen_bridge_stubs.py" "${UI_DIR}/Bridge/ARMSX2Bridge.h"
+          "${UI_DIR}/Bridge/DSBridge.mm"
+  COMMENT "Generating ARMSX2Bridge stubs"
 )
 
-set_target_properties(duckstation-ios PROPERTIES OUTPUT_NAME "DuckStation")
-set_source_files_properties(ios_app.mm ios_host.mm PROPERTIES
-  COMPILE_FLAGS "-fobjc-arc"
+set(OBJC_SOURCES
+  ios_host.mm
+  "${UI_DIR}/Bridge/DSBridge.mm"
+  "${BRIDGE_STUBS}"
+  "${UI_DIR}/Runtime/DSRuntime.mm"
+)
+
+add_executable(duckstation-ios ${OBJC_SOURCES} ios_host.h ${SWIFT_SOURCES})
+
+set_target_properties(duckstation-ios PROPERTIES
+  OUTPUT_NAME "DuckStation"
+  Swift_MODULE_NAME "DuckStation"
+  BUILD_RPATH "@executable_path/Frameworks"
+  INSTALL_RPATH "@executable_path/Frameworks"
+)
+
+set_source_files_properties(${OBJC_SOURCES} PROPERTIES
+  COMPILE_FLAGS "-fobjc-arc -fmodules"
   SKIP_PRECOMPILE_HEADERS TRUE
+)
+
+target_include_directories(duckstation-ios PRIVATE "${UI_DIR}/Bridge" "${CMAKE_CURRENT_SOURCE_DIR}")
+
+# Swift: language mode 6 like ARMSX2, ObjC bridge exposed through the bridging header.
+target_compile_options(duckstation-ios PRIVATE
+  "$<$<COMPILE_LANGUAGE:Swift>:SHELL:-swift-version 6>"
+  "$<$<COMPILE_LANGUAGE:Swift>:SHELL:-import-objc-header ${UI_DIR}/Bridge/ARMSX2-Bridging-Header.h>"
+  "$<$<COMPILE_LANGUAGE:Swift>:SHELL:-Xcc -I${UI_DIR}/Bridge>"
 )
 
 target_link_libraries(duckstation-ios PRIVATE core util common scmversion SDL2::SDL2)
 
 target_link_libraries(duckstation-ios PRIVATE
+  "-lc++"
   "-framework Foundation"
   "-framework UIKit"
+  "-framework SwiftUI"
+  "-framework Observation"
+  "-framework Combine"
   "-framework Metal"
+  "-framework MetalKit"
   "-framework QuartzCore"
   "-framework CoreGraphics"
+  "-framework ImageIO"
   "-framework GameController"
   "-framework UniformTypeIdentifiers"
+  "-framework PhotosUI"
+  "-framework AVKit"
   "-framework AVFoundation"
   "-framework AudioToolbox"
   "-framework CoreAudio"
@@ -29,20 +78,15 @@ target_link_libraries(duckstation-ios PRIVATE
   "-framework CoreHaptics"
   "-framework CoreBluetooth"
   "-framework CoreFoundation"
+  "-framework CryptoKit"
   "-framework Security"
 )
-
-# Dylibs (shaderc, spirv-cross, soundtouch) are copied into App.app/Frameworks by the packaging script.
-set_target_properties(duckstation-ios PROPERTIES
-  BUILD_RPATH "@executable_path/Frameworks"
-  INSTALL_RPATH "@executable_path/Frameworks"
-)
-
-# Builds Metal23.metallib next to the binary.
-add_util_resources(duckstation-ios)
 
 # Static libwebp depends on libsharpyuv, which FindWebP doesn't pull in.
 find_library(SHARPYUV_LIBRARY sharpyuv)
 if(SHARPYUV_LIBRARY)
   target_link_libraries(duckstation-ios PRIVATE "${SHARPYUV_LIBRARY}")
 endif()
+
+# Builds Metal23.metallib next to the binary.
+add_util_resources(duckstation-ios)

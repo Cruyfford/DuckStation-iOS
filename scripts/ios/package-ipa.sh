@@ -76,6 +76,22 @@ fi
 codesign --force --sign - --timestamp=none "$EXE_TMP"
 mv "$EXE_TMP" "$APP/DuckStation"
 
+# ARMSX2 SwiftUI frontend assets (laid out the way ARMSX2's bundle has them).
+UI_ASSETS="$ROOT_DIR/src/duckstation-ios/ui/assets"
+xcrun actool "$UI_ASSETS/Assets.xcassets" --compile "$APP" --platform iphoneos \
+  --minimum-deployment-target 17.4 --target-device iphone --target-device ipad \
+  --output-partial-info-plist "$STAGE/assets-partial.plist" --errors --warnings >/dev/null
+xcrun xcstringstool compile "$UI_ASSETS/resources/Localizable.xcstrings" --output-directory "$APP"
+cp "$UI_ASSETS"/controller_icons/*.png "$APP/"
+cp -R "$UI_ASSETS/controller_skins" "$APP/controller_skins"
+cp -R "$UI_ASSETS/shaders" "$APP/shaders"
+cp "$UI_ASSETS"/video/* "$APP/"
+find "$UI_ASSETS/app_icons" -name '*.png' -exec cp {} "$APP/" \;
+mkdir -p "$APP/ui_audio/default"
+cp "$UI_ASSETS"/ui_audio/* "$APP/ui_audio/default/"
+find "$UI_ASSETS/resources" -maxdepth 1 -type f ! -name '*.xcstrings' -exec cp {} "$APP/" \;
+ls -d "$APP"/*.lproj
+
 # App icons
 cp "$ROOT_DIR"/scripts/ios/icons/AppIcon*.png "$APP/"
 rm -f "$APP/AppIcon1024.png"
@@ -106,7 +122,7 @@ cat > "$APP/Info.plist" <<EOF
   <key>CFBundleShortVersionString</key><string>0.1.$VERSION</string>
   <key>CFBundleVersion</key><string>$VERSION</string>
   <key>CFBundleSupportedPlatforms</key><array><string>iPhoneOS</string></array>
-  <key>CFBundleLocalizations</key><array><string>en</string><string>ar</string></array>
+  <key>CFBundleLocalizations</key><array><string>en</string><string>ar</string><string>de</string><string>es</string><string>fr</string><string>it</string><string>ja</string><string>ko</string><string>pt</string><string>zh-Hans</string></array>
   <key>CFBundleIcons</key>
   <dict>
     <key>CFBundlePrimaryIcon</key>
@@ -133,7 +149,22 @@ cat > "$APP/Info.plist" <<EOF
   <key>DTXcode</key><string>$XCODE_VERSION</string>
   <key>DTXcodeBuild</key><string>$XCODE_BUILD</string>
   <key>LSRequiresIPhoneOS</key><true/>
-  <key>MinimumOSVersion</key><string>15.0</string>
+  <key>MinimumOSVersion</key><string>17.4</string>
+  <key>UIApplicationSceneManifest</key>
+  <dict>
+    <key>UIApplicationSupportsMultipleScenes</key><false/>
+    <key>UISceneConfigurations</key>
+    <dict>
+      <key>UIWindowSceneSessionRoleApplication</key>
+      <array>
+        <dict>
+          <key>UISceneConfigurationName</key><string>Default Configuration</string>
+          <key>UISceneDelegateClassName</key><string>DSSceneDelegate</string>
+        </dict>
+      </array>
+    </dict>
+  </dict>
+  <key>NSPhotoLibraryUsageDescription</key><string>Used to pick custom backgrounds and skins.</string>
   <key>UIDeviceFamily</key><array><integer>1</integer><integer>2</integer></array>
   <key>UILaunchScreen</key><dict/>
   <key>UIRequiresFullScreen</key><true/>

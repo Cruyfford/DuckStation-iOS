@@ -389,11 +389,26 @@ void Host::FrameDone()
 
 void IOSHost::BootGame(const std::string& path)
 {
-  Host::RunOnCPUThread([path]() {
+  BootGameWithResume(path, false);
+}
+
+void IOSHost::BootGameWithResume(const std::string& path, bool load_resume_state)
+{
+  Host::RunOnCPUThread([path, load_resume_state]() {
     if (System::IsValid())
       System::ShutdownSystem(false);
 
     SystemBootParameters params(path);
+    if (load_resume_state && !path.empty())
+    {
+      GameList::Entry entry;
+      if (GameList::PopulateEntryFromPath(path, &entry) && !entry.serial.empty())
+      {
+        std::string resume = System::GetGameSaveStateFileName(entry.serial, -1);
+        if (FileSystem::FileExists(resume.c_str()))
+          params.save_state = std::move(resume);
+      }
+    }
     Error error;
     if (!System::BootSystem(std::move(params), &error))
       PostEvent(Event::Error, error.GetDescription());
@@ -477,6 +492,121 @@ void IOSHost::SetPadButton(PadButton button, bool pressed)
   });
 }
 
+void IOSHost::SetPadStick(int stick, float x, float y)
+{
+  // AnalogController binds: buttons first (Button::Count = 17), then half-axes LLeft..RUp.
+  static constexpr u32 FIRST_HALF_AXIS = 17;
+  const u32 base = FIRST_HALF_AXIS + (stick ? 4u : 0u);
+  const float left = x < 0.0f ? -x : 0.0f, right = x > 0.0f ? x : 0.0f;
+  const float up = y < 0.0f ? -y : 0.0f, down = y > 0.0f ? y : 0.0f;
+  Host::RunOnCPUThread([base, left, right, up, down]() {
+    if (Controller* pad = System::GetController(0))
+    {
+      pad->SetBindState(base + 0, left);
+      pad->SetBindState(base + 1, right);
+      pad->SetBindState(base + 2, down);
+      pad->SetBindState(base + 3, up);
+    }
+  });
+}
+
+bool IOSHost::GetGameInfo(const std::string& path, GameInfo* info)
+{
+  GameList::Entry entry;
+  if (!GameList::PopulateEntryFromPath(path, &entry))
+    return false;
+
+  info->title = entry.title;
+  info->serial = entry.serial;
+  info->region = Settings::GetDiscRegionName(entry.region);
+  return true;
+}
+
+bool IOSHost::IsPaused()
+{
+  return System::IsPaused();
+}
+
+// Cached from Host::OnGameChanged so UI-thread queries never wait on the CPU thread
+// (which may itself be waiting on the main thread while the Metal layer is created).
+static std::mutex s_game_info_mutex;
+static std::string s_cur_path, s_cur_serial, s_cur_title;
+
+std::string IOSHost::GetCurrentGamePath()
+{
+  std::unique_lock lock(s_game_info_mutex);
+  return s_cur_path;
+}
+
+std::string IOSHost::GetCurrentGameSerial()
+{
+  std::unique_lock lock(s_game_info_mutex);
+  return s_cur_serial;
+}
+
+std::string IOSHost::GetCurrentGameTitle()
+{
+  std::unique_lock lock(s_game_info_mutex);
+  return s_cur_title;
+}
+
+std::string IOSHost::GetSaveStatePathForSlot(int slot)
+{
+  const std::string serial = GetCurrentGameSerial();
+  return serial.empty() ? std::string() : System::GetGameSaveStateFileName(serial, slot);
+}
+
+std::string IOSHost::GetSaveStatePathForSerial(const std::string& serial, int slot)
+{
+  return serial.empty() ? std::string() : System::GetGameSaveStateFileName(serial, slot);
+}
+
+bool IOSHost::SaveStateToPathSync(const std::string& path)
+{
+  bool ok = false;
+  Host::RunOnCPUThread([&path, &ok]() {
+    if (!System::IsValid())
+      return;
+    Error error;
+    ok = System::SaveState(path.c_str(), &error, true);
+    if (!ok)
+      ERROR_LOG("Save state failed: {}", error.GetDescription());
+  }, true);
+  return ok;
+}
+
+bool IOSHost::SaveResumeState()
+{
+  const std::string path = GetSaveStatePathForSlot(-1);
+  return !path.empty() && SaveStateToPathSync(path);
+}
+
+bool IOSHost::SaveStateToSlotSync(int slot)
+{
+  const std::string path = GetSaveStatePathForSlot(slot);
+  return !path.empty() && SaveStateToPathSync(path);
+}
+
+bool IOSHost::LoadStateFromPathSync(const std::string& path)
+{
+  bool ok = false;
+  Host::RunOnCPUThread([&path, &ok]() {
+    if (!System::IsValid() || !FileSystem::FileExists(path.c_str()))
+      return;
+    Error error;
+    ok = System::LoadState(path.c_str(), &error, true);
+    if (!ok)
+      ERROR_LOG("Load state failed: {}", error.GetDescription());
+  }, true);
+  return ok;
+}
+
+bool IOSHost::LoadStateFromSlotSync(int slot)
+{
+  const std::string path = GetSaveStatePathForSlot(slot);
+  return !path.empty() && LoadStateFromPathSync(path);
+}
+
 //////////////////////////////////////////////////////////////////////////
 // Settings
 //////////////////////////////////////////////////////////////////////////
@@ -509,6 +639,58 @@ void IOSHost::SetBoolSetting(const char* section, const char* key, bool value)
 void IOSHost::SetStringSetting(const char* section, const char* key, const char* value)
 {
   Host::SetBaseStringSettingValue(section, key, value);
+}
+
+float IOSHost::GetFloatSetting(const char* section, const char* key, float default_value)
+{
+  return Host::GetBaseFloatSettingValue(section, key, default_value);
+}
+
+void IOSHost::SetFloatSetting(const char* section, const char* key, float value)
+{
+  Host::SetBaseFloatSettingValue(section, key, value);
+}
+
+void IOSHost::SetFloatSettingRuntime(const char* section, const char* key, float value)
+{
+  Host::SetBaseFloatSettingValue(section, key, value);
+  Host::RunOnCPUThread([]() { System::ApplySettings(false); });
+}
+
+void IOSHost::ClearSettingsSection(const char* section)
+{
+  auto lock = Host::GetSettingsLock();
+  if (s_settings)
+    s_settings->ClearSection(section);
+}
+
+std::vector<unsigned char> IOSHost::GetSaveStatePreviewPNG(const std::string& path)
+{
+  std::optional<ExtendedSaveStateInfo> info = System::GetExtendedSaveStateInfo(path.c_str());
+  if (!info.has_value() || !info->screenshot.IsValid())
+    return {};
+
+  std::optional<std::vector<u8>> png = info->screenshot.SaveToBuffer("preview.png");
+  return png.has_value() ? std::vector<unsigned char>(png->begin(), png->end()) : std::vector<unsigned char>();
+}
+
+std::vector<IOSHost::BIOSInfo> IOSHost::ListBIOSImages()
+{
+  std::vector<BIOSInfo> ret;
+  for (const auto& [path, image] : BIOS::FindBIOSImagesInDirectory(EmuFolders::Bios.c_str()))
+  {
+    BIOSInfo bi;
+    bi.path = path;
+    bi.file_name = std::string(Path::GetFileName(path));
+    bi.valid = (image != nullptr);
+    bi.description = image ? image->description : "Unknown BIOS";
+    bi.region = image ? Settings::GetConsoleRegionName(image->region) : "";
+    bi.country_code = !image ? "" :
+                      (image->region == ConsoleRegion::NTSC_J ? "JP" :
+                                                                 (image->region == ConsoleRegion::PAL ? "EU" : "US"));
+    ret.push_back(std::move(bi));
+  }
+  return ret;
 }
 
 void IOSHost::CommitSettings()
@@ -645,6 +827,12 @@ void Host::OnSystemStarted()
 
 void Host::OnSystemDestroyed()
 {
+  {
+    std::unique_lock lock(s_game_info_mutex);
+    s_cur_path.clear();
+    s_cur_serial.clear();
+    s_cur_title.clear();
+  }
   PlatformMisc::ResumeScreensaver();
   IOSHost::PostEvent(IOSHost::Event::Stopped);
 }
@@ -670,6 +858,10 @@ void Host::OnPerformanceCountersUpdated()
 void Host::OnGameChanged(const std::string& disc_path, const std::string& game_serial, const std::string& game_name)
 {
   INFO_LOG("Game: {} [{}] ({})", game_name, game_serial, disc_path);
+  std::unique_lock lock(s_game_info_mutex);
+  s_cur_path = disc_path;
+  s_cur_serial = game_serial;
+  s_cur_title = game_name;
 }
 
 void Host::OnMediaCaptureStarted()
