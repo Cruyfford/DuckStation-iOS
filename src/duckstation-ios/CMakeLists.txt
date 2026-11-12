@@ -82,6 +82,18 @@ target_link_libraries(duckstation-ios PRIVATE
   "-framework Security"
 )
 
+# Link with clang++ (swiftc rejects -Wl,-framework,... flags from SDL's static target) and point it at
+# the Swift runtime/compat libraries that the Swift objects auto-link.
+set_target_properties(duckstation-ios PROPERTIES LINKER_LANGUAGE CXX)
+execute_process(COMMAND xcrun --sdk iphoneos --show-sdk-path OUTPUT_VARIABLE IOS_SDK_PATH OUTPUT_STRIP_TRAILING_WHITESPACE)
+execute_process(COMMAND xcrun --sdk iphoneos --find swiftc OUTPUT_VARIABLE SWIFTC_PATH OUTPUT_STRIP_TRAILING_WHITESPACE)
+get_filename_component(SWIFT_TOOLCHAIN_BIN "${SWIFTC_PATH}" DIRECTORY)
+target_link_options(duckstation-ios PRIVATE
+  "-L${IOS_SDK_PATH}/usr/lib/swift"
+  "-L${SWIFT_TOOLCHAIN_BIN}/../lib/swift/iphoneos"
+  "-Wl,-rpath,/usr/lib/swift"
+)
+
 # Static libwebp depends on libsharpyuv, which FindWebP doesn't pull in.
 find_library(SHARPYUV_LIBRARY sharpyuv)
 if(SHARPYUV_LIBRARY)
