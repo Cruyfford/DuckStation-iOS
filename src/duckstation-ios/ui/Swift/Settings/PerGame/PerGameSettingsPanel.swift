@@ -688,7 +688,12 @@ struct PerGameSettingsPanel: View {
         return settings.gameFixEnabled("OPHFlagHack")
     }
 
+    // DuckStation: the PS2 per-game tabs are replaced by DuckStation's settings.
     var body: some View {
+        DSInGameSettingsView(onDone: onDone)
+    }
+
+    var armsx2Body: some View {
         OverlayPanelScaffold(usesRegularGlass: true) {
             GeometryReader { geo in
                 // Rail and detail pane on a wide card, NavigationStack form on a tall one.

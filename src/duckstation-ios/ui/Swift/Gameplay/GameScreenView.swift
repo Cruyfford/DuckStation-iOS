@@ -502,7 +502,7 @@ struct GameScreenView: View {
                     // Downloading, selecting, and editing presets are frontend
                     // capabilities and must not disappear when an optional
                     // renderer was omitted from a particular build.
-                    shaderChainAvailable: true,
+                    shaderChainAvailable: false, // PS2 shader chain; DuckStation post-processing lives in Settings
                     gameTitle: currentRuntimeGameName(),
                     variant: metrics.variant,
                     returningFrom: pauseMenuChild,

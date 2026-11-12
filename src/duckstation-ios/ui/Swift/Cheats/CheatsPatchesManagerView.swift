@@ -122,7 +122,12 @@ struct CheatsPatchesManagerView: View {
         self.session = session
     }
 
+    // DuckStation: PS2 pnach cheats/patches don't apply to PS1 games.
     var body: some View {
+        DSUnavailableView(onClose: onClose)
+    }
+
+    var armsx2Body: some View {
         NavigationStack {
             ScrollViewReader { proxy in
                 Form {

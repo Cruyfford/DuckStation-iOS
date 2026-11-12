@@ -754,37 +754,9 @@ struct SettingsRootView: View {
                 Text(settings.localized("Interface"))
             }
 
-            Section(settings.localized("Emulation")) {
-                NavigationLink(value: SettingsPane.emulator) {
-                    Label(settings.localized("Emulator"), systemImage: "cpu")
-                }
-                .controllerSettingsDestination(.emulator, path: $navigationPath)
-                .gameCardTintMenuBackgroundListRow(backgroundActive)
-                NavigationLink(value: SettingsPane.graphics) {
-                    Label(settings.localized("Graphics"), systemImage: "paintbrush")
-                }
-                .controllerSettingsDestination(.graphics, path: $navigationPath)
-                .gameCardTintMenuBackgroundListRow(backgroundActive)
-                NavigationLink(value: SettingsPane.shaders) {
-                    Label(settings.localized("Shaders"), systemImage: "camera.filters")
-                }
-                .controllerSettingsDestination(.shaders, path: $navigationPath)
-                .gameCardTintMenuBackgroundListRow(backgroundActive)
-                NavigationLink(value: SettingsPane.texturePacks) {
-                    Label(settings.localized("Texture Packs"), systemImage: "photo.stack")
-                }
-                .controllerSettingsDestination(.texturePacks, path: $navigationPath)
-                .gameCardTintMenuBackgroundListRow(backgroundActive)
-                NavigationLink(value: SettingsPane.framePacing) {
-                    Label(settings.localized("Frame Pacing"), systemImage: "speedometer")
-                }
-                .controllerSettingsDestination(.framePacing, path: $navigationPath)
-                .gameCardTintMenuBackgroundListRow(backgroundActive)
-                NavigationLink(value: SettingsPane.audio) {
-                    Label(settings.localized("Audio"), systemImage: "speaker.wave.2")
-                }
-                .controllerSettingsDestination(.audio, path: $navigationPath)
-                .gameCardTintMenuBackgroundListRow(backgroundActive)
+            Section("DuckStation") {
+                DSSettingsCategoryRows()
+                    .gameCardTintMenuBackgroundListRow(backgroundActive)
             }
 
             Section(settings.localized("Input")) {
@@ -798,42 +770,9 @@ struct SettingsRootView: View {
                 }
                 .controllerSettingsDestination(.virtualPad, path: $navigationPath)
                 .gameCardTintMenuBackgroundListRow(backgroundActive)
-                NavigationLink(value: SettingsPane.localMultiplayer) {
-                    Label(settings.localized("Local Multiplayer"), systemImage: "person.3")
-                }
-                .controllerSettingsDestination(.localMultiplayer, path: $navigationPath)
-                .gameCardTintMenuBackgroundListRow(backgroundActive)
             }
 
-            Section(settings.localized("Storage & Memory")) {
-                NavigationLink(value: SettingsPane.memoryCards) {
-                    Label(settings.localized("Memory Cards"), systemImage: "memorychip")
-                }
-                .controllerSettingsDestination(.memoryCards, path: $navigationPath)
-                .gameCardTintMenuBackgroundListRow(backgroundActive)
-                NavigationLink(value: SettingsPane.storage) {
-                    Label(settings.localized("Storage"), systemImage: "internaldrive")
-                }
-                .controllerSettingsDestination(.storage, path: $navigationPath)
-                .gameCardTintMenuBackgroundListRow(backgroundActive)
-                NavigationLink(value: SettingsPane.network) {
-                    Label(settings.localized("Network"), systemImage: "network")
-                }
-                .controllerSettingsDestination(.network, path: $navigationPath)
-                .gameCardTintMenuBackgroundListRow(backgroundActive)
-            }
-
-            Section(settings.localized("Features")) {
-                NavigationLink(value: SettingsPane.settingsPresets) {
-                    Label(settings.localized("Settings Presets"), systemImage: "slider.horizontal.3")
-                }
-                .controllerSettingsDestination(.settingsPresets, path: $navigationPath)
-                .gameCardTintMenuBackgroundListRow(backgroundActive)
-                NavigationLink(value: SettingsPane.retroAchievements) {
-                    Label(settings.localized("RetroAchievements"), systemImage: "trophy")
-                }
-                .controllerSettingsDestination(.retroAchievements, path: $navigationPath)
-                .gameCardTintMenuBackgroundListRow(backgroundActive)
+            Section(DSLanguage.text("Customization", "التخصيص")) {
                 NavigationLink(value: SettingsPane.customSkin) {
                     Label(
                         settings.localized("Custom Skin"),
@@ -842,36 +781,6 @@ struct SettingsRootView: View {
                 }
                 .controllerSettingsDestination(.customSkin, path: $navigationPath)
                 .gameCardTintMenuBackgroundListRow(backgroundActive)
-                NavigationLink(value: SettingsPane.overlay) {
-                    Label(settings.localized("Overlay (OSD)"), systemImage: "text.below.photo")
-                }
-                .controllerSettingsDestination(.overlay, path: $navigationPath)
-                .gameCardTintMenuBackgroundListRow(backgroundActive)
-            }
-
-            Section {
-                jitStatusRow
-                    .gameCardTintMenuBackgroundListRow(backgroundActive)
-
-                Button {
-                    openStikDebug()
-                } label: {
-                    Label(settings.localized("Open StikDebug/StosDebug"), systemImage: "bolt.horizontal.circle")
-                }
-                .disabled(stikDebugOpenInProgress)
-                .controllerAccessibilityActionTarget(
-                    id: "settings.root.open-stik-debug",
-                    label: settings.localized("Open StikDebug/StosDebug"),
-                    action: openStikDebug
-                )
-                .gameCardTintMenuBackgroundListRow(backgroundActive)
-
-                Text(settings.localized("JIT Access means iOS currently allows executable memory. Confirm the real runtime state in-game: the OSD should show EE:JIT, IOP:JIT, and VU:JIT. Match the StikDebug/StosDebug script to the JIT Script setting in Emulator settings."))
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
-                    .gameCardTintMenuBackgroundListRow(backgroundActive)
-            } header: {
-                Text(settings.localized("JIT Status"))
             }
 
             Section {

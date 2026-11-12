@@ -359,12 +359,7 @@ struct QuickMenuView: View {
             order.append(ControllerTargetID.saveStates)
         }
         if vmMenuAvailable { order.append(ControllerTargetID.changeDisc) }
-        if gameMenuAvailable {
-            order.append(contentsOf: [
-                ControllerTargetID.retroAchievements,
-                ControllerTargetID.cheats,
-            ])
-        }
+
         if shaderChainAvailable { order.append(ControllerTargetID.shaders) }
         if vmMenuAvailable { order.append(ControllerTargetID.resetROM) }
         if gameMenuAvailable { order.append(ControllerTargetID.clearCache) }
@@ -585,12 +580,7 @@ struct QuickMenuView: View {
             contentOrder.append(ControllerTargetID.saveStates)
         }
         if vmMenuAvailable { contentOrder.append(ControllerTargetID.changeDisc) }
-        if gameMenuAvailable {
-            contentOrder.append(contentsOf: [
-                ControllerTargetID.retroAchievements,
-                ControllerTargetID.cheats,
-            ])
-        }
+
         if shaderChainAvailable {
             contentOrder.append(ControllerTargetID.shaders)
         }
@@ -1042,22 +1032,6 @@ struct QuickMenuView: View {
                 systemImage: "opticaldisc"
             ) {
                 onOpen(.changeDisc)
-            }
-        }
-        if gameMenuAvailable {
-            OverlayActionRow(
-                controllerNavigationID: ControllerTargetID.retroAchievements,
-                label: settings.localized("RetroAchievements"),
-                systemImage: "trophy.fill"
-            ) {
-                onOpen(.retroAchievements)
-            }
-            OverlayActionRow(
-                controllerNavigationID: ControllerTargetID.cheats,
-                label: settings.localized("Cheats & Patches"),
-                systemImage: "rectangle.stack.badge.plus"
-            ) {
-                onOpen(.cheats)
             }
         }
         if shaderChainAvailable {

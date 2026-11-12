@@ -119,7 +119,13 @@ enum AppLanguage: String, CaseIterable, Identifiable {
     }
 
     func localized(_ key: String) -> String {
+        // DuckStation build of the ARMSX2 interface: show our name wherever the strings say ARMSX2.
         bundle.localizedString(forKey: key, value: key, table: nil)
+            .replacingOccurrences(of: "ARMSX2", with: "DuckStation")
+            .replacingOccurrences(of: "PCSX2", with: "DuckStation")
+            .replacingOccurrences(of: "PS2 BIOS", with: "PS1 BIOS")
+            .replacingOccurrences(of: "PS2 disc", with: "PS1 disc")
+            .replacingOccurrences(of: "PlayStation 2", with: "PlayStation")
     }
 
 }

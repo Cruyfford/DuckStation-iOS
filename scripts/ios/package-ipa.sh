@@ -85,7 +85,7 @@ xcrun xcstringstool compile "$UI_ASSETS/resources/Localizable.xcstrings" --outpu
 cp "$UI_ASSETS"/controller_icons/*.png "$APP/"
 cp -R "$UI_ASSETS/controller_skins" "$APP/controller_skins"
 cp -R "$UI_ASSETS/shaders" "$APP/shaders"
-cp "$UI_ASSETS"/video/* "$APP/"
+# No ARMSX2 boot video: the splash skips straight to the library.
 find "$UI_ASSETS/app_icons" -name '*.png' -exec cp {} "$APP/" \;
 mkdir -p "$APP/ui_audio/default"
 cp "$UI_ASSETS"/ui_audio/* "$APP/ui_audio/default/"

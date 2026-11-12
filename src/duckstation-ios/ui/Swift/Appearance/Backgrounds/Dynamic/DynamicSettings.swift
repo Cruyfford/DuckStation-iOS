@@ -557,12 +557,13 @@ struct DynamicAppearancePreferences: Codable, Equatable {
   var hasSelectedPlayStation3XMBByMart: Bool
   var isPlayStation3XMBPresetExplicit: Bool
 
+  // DuckStation: PS1-style background in classic PlayStation grey by default.
   static let standard = DynamicAppearancePreferences(
-    dynamicBackground: .playStation3XMBByMart,
-    sharedPalette: .blue,
+    dynamicBackground: .spatialRetro,
+    sharedPalette: .platinumGrey,
     sharedCustomColor: nil,
     sharedMultiColor: ThemeMultiColorSelection(),
-    ribbonPalette: .cyan,
+    ribbonPalette: .silver,
     ribbonCustomColor: nil,
     ribbonMultiColor: ThemeMultiColorSelection(),
     particleSettings: DynamicParticleSettings(),
