@@ -23,9 +23,9 @@ jobs:
       - name: Install build tools
         run: brew install ninja || true
 
-      - name: Cache dependencies
+      - name: Restore dependencies
         id: cache-deps
-        uses: actions/cache@v4
+        uses: actions/cache/restore@v4
         with:
           path: deps-ios
           key: deps-ios-${{ hashFiles('scripts/deps/build-dependencies-ios.sh') }}
@@ -33,6 +33,14 @@ jobs:
       - name: Build dependencies
         if: steps.cache-deps.outputs.cache-hit != 'true'
         run: bash scripts/deps/build-dependencies-ios.sh "$PWD/deps-ios"
+
+      # Saved right away so later compile failures don't throw the (slow) dependency build away.
+      - name: Save dependencies
+        if: steps.cache-deps.outputs.cache-hit != 'true'
+        uses: actions/cache/save@v4
+        with:
+          path: deps-ios
+          key: deps-ios-${{ hashFiles('scripts/deps/build-dependencies-ios.sh') }}
 
       - name: Configure
         run: |
@@ -50,7 +58,8 @@ jobs:
             -DBUILD_IOS_FRONTEND=ON
 
       - name: Build
-        run: cmake --build build --parallel "$(sysctl -n hw.ncpu)"
+        # -k 0: keep going so one run reports every compile error.
+        run: cmake --build build --parallel "$(sysctl -n hw.ncpu)" -- -k 0
 
       - name: Package IPA
         run: bash scripts/ios/package-ipa.sh build deps-ios out/DuckStation.ipa

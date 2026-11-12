@@ -22,7 +22,11 @@ enum class PageProtect : u32
 
 #elif defined(__APPLE__)
 
+#ifdef DUCKSTATION_IOS
+#include <mach/mach.h> // mach_vm.h is unavailable on iOS
+#else
 #include <mach/mach_vm.h>
+#endif
 
 enum class PageProtect : u32
 {

@@ -24,8 +24,47 @@
 #include <mach-o/getsect.h>
 #include <mach/mach_init.h>
 #include <mach/mach_port.h>
+#ifdef DUCKSTATION_IOS
+#include <mach/mach.h>
+#include <mach/vm_map.h>
+// mach_vm.h is unavailable on iOS; forward to the equivalent vm_* calls (64-bit on arm64).
+static inline kern_return_t ds_vm_protect(vm_map_t task, mach_vm_address_t address, mach_vm_size_t size,
+                                          boolean_t set_maximum, vm_prot_t new_protection)
+{
+  return vm_protect(task, static_cast<vm_address_t>(address), static_cast<vm_size_t>(size), set_maximum,
+                    new_protection);
+}
+static inline kern_return_t ds_vm_deallocate(vm_map_t task, mach_vm_address_t address, mach_vm_size_t size)
+{
+  return vm_deallocate(task, static_cast<vm_address_t>(address), static_cast<vm_size_t>(size));
+}
+static inline kern_return_t ds_vm_allocate(vm_map_t task, mach_vm_address_t* address, mach_vm_size_t size, int flags)
+{
+  vm_address_t addr = static_cast<vm_address_t>(*address);
+  const kern_return_t res = vm_allocate(task, &addr, static_cast<vm_size_t>(size), flags);
+  *address = addr;
+  return res;
+}
+static inline kern_return_t ds_vm_map(vm_map_t task, mach_vm_address_t* address, mach_vm_size_t size,
+                                      mach_vm_offset_t mask, int flags, mem_entry_name_port_t object,
+                                      memory_object_offset_t offset, boolean_t copy, vm_prot_t cur_protection,
+                                      vm_prot_t max_protection, vm_inherit_t inheritance)
+{
+  vm_address_t addr = static_cast<vm_address_t>(*address);
+  const kern_return_t res =
+    vm_map(task, &addr, static_cast<vm_size_t>(size), static_cast<vm_address_t>(mask), flags, object,
+           static_cast<vm_offset_t>(offset), copy, cur_protection, max_protection, inheritance);
+  *address = addr;
+  return res;
+}
+#define mach_vm_protect ds_vm_protect
+#define mach_vm_deallocate ds_vm_deallocate
+#define mach_vm_allocate ds_vm_allocate
+#define mach_vm_map ds_vm_map
+#else
 #include <mach/mach_vm.h>
 #include <mach/vm_map.h>
+#endif
 #include <sys/mman.h>
 #elif !defined(__ANDROID__)
 #include <cerrno>
