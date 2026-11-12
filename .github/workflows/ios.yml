@@ -11,7 +11,7 @@ permissions:
 
 jobs:
   build:
-    runs-on: macos-15
+    runs-on: macos-26
     timeout-minutes: 120
     steps:
       - uses: actions/checkout@v4
@@ -20,7 +20,8 @@ jobs:
 
       - name: Select Xcode
         run: |
-          sudo xcode-select -s "$(ls -d /Applications/Xcode_16*.app | sort -V | tail -n 1)"
+          # iOS 26 SDK needed for the SwiftUI frontend (Liquid Glass APIs).
+          sudo xcode-select -s "$(ls -d /Applications/Xcode_26*.app | sort -V | tail -n 1)"
           xcodebuild -version
 
       - name: Install build tools
@@ -31,7 +32,7 @@ jobs:
         uses: actions/cache/restore@v4
         with:
           path: deps-ios
-          key: deps-ios-${{ hashFiles('scripts/deps/build-dependencies-ios.sh') }}
+          key: deps-ios-macos26-${{ hashFiles('scripts/deps/build-dependencies-ios.sh') }}
 
       - name: Build dependencies
         if: steps.cache-deps.outputs.cache-hit != 'true'
@@ -43,7 +44,7 @@ jobs:
         uses: actions/cache/save@v4
         with:
           path: deps-ios
-          key: deps-ios-${{ hashFiles('scripts/deps/build-dependencies-ios.sh') }}
+          key: deps-ios-macos26-${{ hashFiles('scripts/deps/build-dependencies-ios.sh') }}
 
       - name: Configure
         run: |
