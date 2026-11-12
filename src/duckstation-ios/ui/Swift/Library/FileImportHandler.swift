@@ -27,7 +27,8 @@ final class FileImportHandler {
     var showImportAlert = false
 
     private static let biosExtensionList = ["bin", "rom"]
-    private static let gameExtensionList = ["iso", "chd", "img", "bin", "cue", "mdf", "cso", "zso", "gz", "elf"]
+    // DuckStation (PS1) disc/executable formats.
+    private static let gameExtensionList = ["cue", "bin", "chd", "pbp", "m3u", "iso", "img", "ecm", "mds", "mdf", "exe", "psexe", "psf"]
     private static let pnachExtensionList = ["pnach"]
     private static let biosExtensions = Set(biosExtensionList)
     private static let gameExtensions = Set(gameExtensionList)
@@ -121,8 +122,7 @@ final class FileImportHandler {
             return []
         }
 
-        let docsPath = URL.documentsDirectory.path
-        let destinationDirectory = (docsPath as NSString).appendingPathComponent(directoryName)
+        let destinationDirectory = directoryName == "bios" ? ARMSX2Bridge.biosDirectory() : ARMSX2Bridge.isoDirectory()
         var existingFileNames: [String] = []
         var seenFileNames = Set<String>()
 
@@ -189,7 +189,7 @@ final class FileImportHandler {
                 NSLog("[ARMSX2 iOS Import] unsupported game file: %@", fileName)
                 return .unsupported(message: Self.unsupportedGameImportMessage(for: fileName))
             }
-            destDir = (docsPath as NSString).appendingPathComponent("iso")
+            destDir = ARMSX2Bridge.isoDirectory()
             category = "Game"
         } else if preferredDestination == .bios {
             guard Self.biosExtensions.contains(ext) else {
@@ -204,20 +204,20 @@ final class FileImportHandler {
                 return .failure(Self.oversizedBIOSImportMessage(for: fileName))
             }
 
-            destDir = (docsPath as NSString).appendingPathComponent("bios")
+            destDir = ARMSX2Bridge.biosDirectory()
             category = "BIOS"
         } else if Self.gameExtensions.subtracting(Self.biosExtensions).contains(ext) {
-            destDir = (docsPath as NSString).appendingPathComponent("iso")
+            destDir = ARMSX2Bridge.isoDirectory()
             category = "Game"
         } else if Self.biosExtensions.contains(ext) {
             // Check file size to distinguish BIOS (.bin ~4MB) from game (.bin ~700MB)
             let attrs = try? FileManager.default.attributesOfItem(atPath: url.path)
             let size = attrs?[.size] as? UInt64 ?? 0
             if ext == "bin" && size > Self.biosSizeThreshold {
-                destDir = (docsPath as NSString).appendingPathComponent("iso")
+                destDir = ARMSX2Bridge.isoDirectory()
                 category = "Game"
             } else {
-                destDir = (docsPath as NSString).appendingPathComponent("bios")
+                destDir = ARMSX2Bridge.biosDirectory()
                 category = "BIOS"
             }
         } else {

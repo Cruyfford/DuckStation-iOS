@@ -111,6 +111,27 @@ static void DSHostEvent(IOSHost::Event event, const char* message)
   NSString* documents = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES).firstObject;
   NSString* bundle = NSBundle.mainBundle.bundlePath;
 
+  // Earlier builds imported into ARMSX2's lowercase folders; move those files where DuckStation looks.
+  NSFileManager* fm = NSFileManager.defaultManager;
+  const struct { NSString* from; NSString* to; } moves[] = {{@"bios", @"BIOS"}, {@"iso", @"Games"}};
+  for (const auto& m : moves)
+  {
+    NSString* from = [documents stringByAppendingPathComponent:m.from];
+    NSString* to = [documents stringByAppendingPathComponent:m.to];
+    NSArray<NSString*>* files = [fm contentsOfDirectoryAtPath:from error:nil];
+    if (!files)
+      continue;
+    [fm createDirectoryAtPath:to withIntermediateDirectories:YES attributes:nil error:nil];
+    for (NSString* f in files)
+    {
+      NSString* dst = [to stringByAppendingPathComponent:f];
+      if (![fm fileExistsAtPath:dst])
+        [fm moveItemAtPath:[from stringByAppendingPathComponent:f] toPath:dst error:nil];
+    }
+    if ([fm contentsOfDirectoryAtPath:from error:nil].count == 0)
+      [fm removeItemAtPath:from error:nil];
+  }
+
   IOSHost::SetEventCallback(&DSHostEvent);
   std::string error;
   if (!IOSHost::Initialize(std::string(documents.fileSystemRepresentation),
