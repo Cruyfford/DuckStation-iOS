@@ -25,6 +25,7 @@
 #include <mach/mach_init.h>
 #include <mach/mach_port.h>
 #ifdef DUCKSTATION_IOS
+#include <libkern/OSCacheControl.h>
 #include <mach/mach.h>
 #include <mach/vm_map.h>
 // mach_vm.h is unavailable on iOS; forward to the equivalent vm_* calls (64-bit on arm64).
@@ -527,7 +528,11 @@ void MemMap::ReleaseJITMemory(void* ptr, size_t size)
 
 void MemMap::FlushInstructionCache(void* address, size_t size)
 {
+#ifdef DUCKSTATION_IOS
+  sys_icache_invalidate(address, size);
+#else
   __builtin___clear_cache(reinterpret_cast<char*>(address), reinterpret_cast<char*>(address) + size);
+#endif
 }
 
 #endif
