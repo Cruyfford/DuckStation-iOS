@@ -193,7 +193,7 @@ enum DSSettingsSchema {
         ]),
         DSSettingsGroup(title: DSText("Game Settings", "إعدادات الألعاب"), settings: [
             DSSetting("Main", "ApplyCompatibilitySettings", DSText("Apply Compatibility Settings", "تطبيق إعدادات التوافق"), .toggle(default: true),
-                      help: DSText("Automatic fixes from DuckStation's game database.", "إصلاحات تلقائية من قاعدة بيانات الألعاب.")),
+                      help: DSText("Automatic fixes from the built-in game database.", "إصلاحات تلقائية من قاعدة بيانات الألعاب.")),
             DSSetting("Main", "ApplyGameSettings", DSText("Apply Per-Game Settings", "تطبيق إعدادات كل لعبة"), .toggle(default: true)),
             DSSetting("Main", "DisableAllEnhancements", DSText("Disable All Enhancements", "تعطيل كل التحسينات"), .toggle(default: false)),
             DSSetting("Console", "EnableCheats", DSText("Enable Cheats", "تفعيل الغش"), .toggle(default: false)),
@@ -380,12 +380,12 @@ enum DSSettingsSchema {
     static let textures = DSSettingsCategory("textures", DSText("Texture Replacement", "استبدال الخامات"), icon: "photo.stack", [
         DSSettingsGroup(title: DSText("Replacement", "الاستبدال"), settings: [
             DSSetting("TextureReplacements", "EnableVRAMWriteReplacements", DSText("Enable Background Replacement", "تفعيل استبدال الخلفيات"), .toggle(default: false),
-                help: DSText("Put PNG files in Files › DuckStation › textures › [Game Serial].", "ضع ملفات PNG في: الملفات › DuckStation › textures › [رقم اللعبة].")),
+                help: DSText("Put PNG files in Files › Psxp › textures › [Game Serial].", "ضع ملفات PNG في: الملفات › Psxp › textures › [رقم اللعبة].")),
             DSSetting("TextureReplacements", "PreloadTextures", DSText("Preload Replacement Textures", "تحميل الخامات البديلة مسبقاً"), .toggle(default: false)),
         ]),
         DSSettingsGroup(title: DSText("Dumping", "الاستخراج"), settings: [
             DSSetting("TextureReplacements", "DumpVRAMWrites", DSText("Dump Replaceable Backgrounds", "استخراج الخلفيات القابلة للاستبدال"), .toggle(default: false),
-                help: DSText("Saved to Files › DuckStation › dump › textures.", "تُحفظ في: الملفات › DuckStation › dump › textures.")),
+                help: DSText("Saved to Files › Psxp › dump › textures.", "تُحفظ في: الملفات › Psxp › dump › textures.")),
             DSSetting("TextureReplacements", "DumpVRAMWriteForceAlphaChannel", DSText("Force Alpha Channel In Dumps", "فرض قناة الشفافية عند الاستخراج"), .toggle(default: true)),
             DSSetting("TextureReplacements", "DumpVRAMWriteWidthThreshold", DSText("Minimum Dump Width", "أقل عرض للاستخراج"), .int(default: 128, min: 1, max: 1024, step: 16, unit: "px")),
             DSSetting("TextureReplacements", "DumpVRAMWriteHeightThreshold", DSText("Minimum Dump Height", "أقل ارتفاع للاستخراج"), .int(default: 128, min: 1, max: 512, step: 16, unit: "px")),
@@ -411,7 +411,7 @@ enum DSSettingsSchema {
                 DSOption("None", "None", "بدون"), DSOption("Error", "Error", "أخطاء"), DSOption("Warning", "Warning", "تحذيرات"),
                 DSOption("Info", "Info", "معلومات"), DSOption("Verbose", "Verbose", "مفصّل"), DSOption("Dev", "Dev", "مطوّر"),
                 DSOption("Debug", "Debug", "تصحيح"), DSOption("Trace", "Trace", "تتبّع كامل"),
-            ]), help: DSText("Log is saved to Files › DuckStation › duckstation.log.", "السجل يُحفظ في: الملفات › DuckStation › duckstation.log.")),
+            ]), help: DSText("Log is saved to Files › Psxp › duckstation.log.", "السجل يُحفظ في: الملفات › Psxp › duckstation.log.")),
             DSSetting("Logging", "LogTimestamps", DSText("Log Timestamps", "توقيت في السجل"), .toggle(default: true)),
         ]),
         DSSettingsGroup(title: DSText("GPU", "كرت الشاشة"), settings: [

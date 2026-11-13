@@ -116,11 +116,11 @@ cat > "$APP/Info.plist" <<EOF
 <plist version="1.0">
 <dict>
   <key>CFBundleDevelopmentRegion</key><string>en</string>
-  <key>CFBundleDisplayName</key><string>DuckStation</string>
+  <key>CFBundleDisplayName</key><string>Psxp</string>
   <key>CFBundleExecutable</key><string>DuckStation</string>
   <key>CFBundleIdentifier</key><string>com.cruyfford.duckstation</string>
   <key>CFBundleInfoDictionaryVersion</key><string>6.0</string>
-  <key>CFBundleName</key><string>DuckStation</string>
+  <key>CFBundleName</key><string>Psxp</string>
   <key>CFBundlePackageType</key><string>APPL</string>
   <key>CFBundleShortVersionString</key><string>0.1.$VERSION</string>
   <key>CFBundleVersion</key><string>$VERSION</string>

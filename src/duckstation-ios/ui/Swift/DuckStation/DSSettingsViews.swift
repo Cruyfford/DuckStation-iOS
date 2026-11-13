@@ -305,8 +305,8 @@ private struct DSBIOSListSection: View {
         } header: {
             Text(DSLanguage.text("Installed BIOS Images", "ملفات البايوس الموجودة"))
         } footer: {
-            Text(DSLanguage.text("DuckStation picks the BIOS that matches each game's region automatically.",
-                                 "يختار DuckStation البايوس المناسب لمنطقة كل لعبة تلقائياً."))
+            Text(DSLanguage.text("Psxp picks the BIOS that matches each game's region automatically.",
+                                 "يختار Psxp البايوس المناسب لمنطقة كل لعبة تلقائياً."))
         }
         .onAppear { bioses = ARMSX2Bridge.availableBIOSInfos() }
     }

@@ -754,7 +754,7 @@ struct SettingsRootView: View {
                 Text(settings.localized("Interface"))
             }
 
-            Section("DuckStation") {
+            Section("Psxp") {
                 DSSettingsCategoryRows()
                     .gameCardTintMenuBackgroundListRow(backgroundActive)
             }
