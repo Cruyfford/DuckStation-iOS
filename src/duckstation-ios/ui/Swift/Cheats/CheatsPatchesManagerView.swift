@@ -122,9 +122,9 @@ struct CheatsPatchesManagerView: View {
         self.session = session
     }
 
-    // DuckStation: PS2 pnach cheats/patches don't apply to PS1 games.
+    // Psxp: PS1 cheats (GameShark codes / .cht files) replace PS2 pnach cheats and patches.
     var body: some View {
-        DSUnavailableView(onClose: onClose)
+        DSCheatsView(onClose: onClose)
     }
 
     var armsx2Body: some View {

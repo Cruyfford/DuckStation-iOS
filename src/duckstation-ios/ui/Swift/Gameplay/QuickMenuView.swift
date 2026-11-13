@@ -359,7 +359,7 @@ struct QuickMenuView: View {
             order.append(ControllerTargetID.saveStates)
         }
         if vmMenuAvailable { order.append(ControllerTargetID.changeDisc) }
-
+        if gameMenuAvailable { order.append(ControllerTargetID.cheats) }
         if shaderChainAvailable { order.append(ControllerTargetID.shaders) }
         if vmMenuAvailable { order.append(ControllerTargetID.resetROM) }
         if gameMenuAvailable { order.append(ControllerTargetID.clearCache) }
@@ -428,7 +428,6 @@ struct QuickMenuView: View {
         let saveStates = ControllerTargetID.saveStates
         let shaders = ControllerTargetID.shaders
         let changeDisc = ControllerTargetID.changeDisc
-        let achievements = ControllerTargetID.retroAchievements
         let cheats = ControllerTargetID.cheats
         let resetROM = ControllerTargetID.resetROM
         let clearCache = ControllerTargetID.clearCache
@@ -445,7 +444,7 @@ struct QuickMenuView: View {
         }
         if vmMenuAvailable { contentOrder.append(changeDisc) }
         if gameMenuAvailable {
-            contentOrder.append(contentsOf: [achievements, cheats])
+            contentOrder.append(cheats)
         }
         if shaderChainAvailable { contentOrder.append(shaders) }
         if vmMenuAvailable { contentOrder.append(resetROM) }
@@ -487,7 +486,7 @@ struct QuickMenuView: View {
         }
         if vmMenuAvailable { rightColumn.append(changeDisc) }
         if gameMenuAvailable {
-            rightColumn.append(contentsOf: [achievements, cheats])
+            rightColumn.append(cheats)
         }
         if shaderChainAvailable { rightColumn.append(shaders) }
         if vmMenuAvailable { rightColumn.append(resetROM) }
@@ -531,7 +530,6 @@ struct QuickMenuView: View {
             (osd, gameController),
             (virtualPad, saveStates),
             (fullScreen, changeDisc),
-            (hideMenu, achievements),
             (speed, cheats),
             (perGame, resetROM),
             (controllerSkin, clearCache),
@@ -580,7 +578,7 @@ struct QuickMenuView: View {
             contentOrder.append(ControllerTargetID.saveStates)
         }
         if vmMenuAvailable { contentOrder.append(ControllerTargetID.changeDisc) }
-
+        if gameMenuAvailable { contentOrder.append(ControllerTargetID.cheats) }
         if shaderChainAvailable {
             contentOrder.append(ControllerTargetID.shaders)
         }
@@ -1032,6 +1030,15 @@ struct QuickMenuView: View {
                 systemImage: "opticaldisc"
             ) {
                 onOpen(.changeDisc)
+            }
+        }
+        if gameMenuAvailable {
+            OverlayActionRow(
+                controllerNavigationID: ControllerTargetID.cheats,
+                label: DSLanguage.text("Cheats", "الغشّات"),
+                systemImage: "wand.and.stars"
+            ) {
+                onOpen(.cheats)
             }
         }
         if shaderChainAvailable {

@@ -123,7 +123,7 @@ private func multiplierOptions(_ range: ClosedRange<Int>, labelForOne: DSText, z
 // MARK: - Categories
 
 enum DSSettingsSchema {
-    static let categories: [DSSettingsCategory] = [console, emulation, bios, memoryCards, graphics, pgxp, display, osd, audio, textures, advanced, debug]
+    static let categories: [DSSettingsCategory] = [console, controller, emulation, bios, memoryCards, graphics, pgxp, display, osd, audio, textures, advanced, debug]
 
     static let console = DSSettingsCategory("console", DSText("Console", "الجهاز"), icon: "playstation.logo", [
         DSSettingsGroup(title: DSText("Console", "الجهاز"), settings: [
@@ -416,6 +416,21 @@ enum DSSettingsSchema {
         ]),
         DSSettingsGroup(title: DSText("GPU", "كرت الشاشة"), settings: [
             DSSetting("GPU", "UseDebugDevice", DSText("Use Debug GPU Device", "استخدام وضع تصحيح كرت الشاشة"), .toggle(default: false)),
+        ]),
+    ])
+
+    static let controller = DSSettingsCategory("controller", DSText("PS1 Controller", "يد تحكم PS1"), icon: "gamecontroller", [
+        DSSettingsGroup(title: DSText("Port 1", "المنفذ 1"), settings: [
+            DSSetting("Pad1", "Type", DSText("Controller Type", "نوع يد التحكم"), .choice(default: "AnalogController", options: [
+                DSOption("AnalogController", "DualShock (Analog)", "DualShock (أنالوج)"),
+                DSOption("DigitalController", "Digital Pad", "يد رقمية (بدون أنالوج)"),
+            ]), help: DSText("Some old games only work with the Digital Pad.", "بعض الألعاب القديمة تعمل فقط مع اليد الرقمية.")),
+            DSSetting("Pad1", "ForceAnalogOnReset", DSText("Start in Analog Mode", "البدء في وضع الأنالوج"), .toggle(default: true),
+                help: DSText("Games that don't support analog stay in digital mode automatically.", "الألعاب التي لا تدعم الأنالوج تبقى على الوضع الرقمي تلقائياً.")),
+            DSSetting("Pad1", "AnalogDPadInDigitalMode", DSText("Stick Moves D-Pad in Digital Mode", "العصا تحرّك الأسهم في الوضع الرقمي"), .toggle(default: true)),
+            DSSetting("Pad1", "AnalogDeadzone", DSText("Stick Deadzone", "المنطقة الميتة للعصا"), .float(default: 0, min: 0, max: 0.5, step: 0.05, unit: "")),
+            DSSetting("Pad1", "AnalogSensitivity", DSText("Stick Sensitivity", "حساسية العصا"), .float(default: 1.33, min: 0.5, max: 2.0, step: 0.05, unit: "x")),
+            DSSetting("Pad1", "VibrationBias", DSText("Vibration Bias", "قوة الاهتزاز الأساسية"), .int(default: 8, min: 0, max: 255, step: 1, unit: "")),
         ]),
     ])
 }
