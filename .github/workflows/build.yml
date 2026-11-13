@@ -2,9 +2,8 @@ name: Build unsigned IPA
 
 on:
   push:
-    branches: ["**"]
+    branches: ["stikpair-ipa"]
     tags: ["v*"]
-  pull_request:
   workflow_dispatch:
 
 concurrency:
@@ -82,3 +81,11 @@ jobs:
         uses: softprops/action-gh-release@v3
         with:
           files: StikPair.ipa
+
+      - name: Publish IPA to branch
+        run: |
+          mkdir out && cp StikPair.ipa out/ && cd out
+          git init -q -b stikpair-ipa-out
+          git -c user.name=ci -c user.email=ci@local commit -q --allow-empty -m init
+          git add StikPair.ipa && git -c user.name=ci -c user.email=ci@local commit -qm "StikPair.ipa ${GITHUB_SHA}"
+          git push -f "https://x-access-token:${{ github.token }}@github.com/${GITHUB_REPOSITORY}" stikpair-ipa-out
