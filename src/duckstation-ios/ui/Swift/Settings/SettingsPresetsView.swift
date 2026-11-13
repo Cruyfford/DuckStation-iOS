@@ -126,7 +126,7 @@ struct SettingsPresetsView: View {
             isPresented: $isExportingPreset,
             document: exportDocument,
             contentType: .armsx2SettingsPreset,
-            defaultFilename: "ARMSX2 Custom Preset.ini"
+            defaultFilename: "Psxp Custom Preset.ini"
         ) { result in
             switch result {
             case .success:
@@ -178,7 +178,7 @@ struct SettingsPresetsView: View {
         Section {
             HStack {
                 Label(
-                    settings.localized("ARMSX2 Folder"),
+                    settings.localized("Psxp Folder"),
                     systemImage: folderAccess.hasSelectedFolder ? "folder.fill.badge.checkmark" : "folder"
                 )
                 Spacer()
@@ -193,8 +193,8 @@ struct SettingsPresetsView: View {
             } label: {
                 Label(
                     settings.localized(folderAccess.hasSelectedFolder
-                        ? "Change ARMSX2 Folder"
-                        : "Select ARMSX2 Folder"),
+                        ? "Change Psxp Folder"
+                        : "Select Psxp Folder"),
                     systemImage: "folder.badge.plus"
                 )
             }
@@ -217,16 +217,16 @@ struct SettingsPresetsView: View {
                     folderAccess.removeSelectedFolder()
                     message = SettingsPresetsMessage(
                         title: "Folder Access Removed",
-                        text: "ARMSX2 will no longer use the saved permission for that folder."
+                        text: "Psxp will no longer use the saved permission for that folder."
                     )
                 } label: {
                     Label(settings.localized("Remove Folder Access"), systemImage: "folder.badge.minus")
                 }
             }
         } header: {
-            Text(settings.localized("ARMSX2 Import Folder"))
+            Text(settings.localized("Psxp Import Folder"))
         } footer: {
-            Text(settings.localized("Selecting the ARMSX2 folder checks its BIOS, GAMES, PRESETS, and SKINS folders. PRESETS/logo.png becomes the Games logo, and PRESETS/audiopack.zip becomes the UI audio pack. ZIP skins are imported, newly imported games receive missing covers, and a skin ZIP whose name starts with 1 becomes the default skin and layout. The saved permission is not scanned again on app launch; use Scan Selected Folder when you want to check it again. Existing imported files are not overwritten."))
+            Text(settings.localized("Selecting the Psxp folder checks its BIOS, GAMES, PRESETS, and SKINS folders. PRESETS/logo.png becomes the Games logo, and PRESETS/audiopack.zip becomes the UI audio pack. ZIP skins are imported, newly imported games receive missing covers, and a skin ZIP whose name starts with 1 becomes the default skin and layout. The saved permission is not scanned again on app launch; use Scan Selected Folder when you want to check it again. Existing imported files are not overwritten."))
                 .lineLimit(nil)
                 .fixedSize(horizontal: false, vertical: true)
         }
@@ -296,7 +296,7 @@ struct SettingsPresetsView: View {
         Section {
             Button {
                 exportDocument = SettingsPresetDocument(
-                    data: SettingsPresetFile.exportData(name: "ARMSX2 Custom Preset", settings: settings)
+                    data: SettingsPresetFile.exportData(name: "Psxp Custom Preset", settings: settings)
                 )
                 isExportingPreset = true
             } label: {
@@ -330,7 +330,7 @@ struct SettingsPresetsView: View {
             Task { @MainActor in
                 let resultMessage = await folderAccess.selectARMSX2Folder(url)
                 message = SettingsPresetsMessage(
-                    title: "ARMSX2 Folder",
+                    title: "Psxp Folder",
                     text: resultMessage
                 )
             }
@@ -348,7 +348,7 @@ struct SettingsPresetsView: View {
         Task { @MainActor in
             let resultMessage = await folderAccess.scanSelectedFolder()
             message = SettingsPresetsMessage(
-                title: "ARMSX2 Folder",
+                title: "Psxp Folder",
                 text: resultMessage
             )
         }
@@ -374,7 +374,7 @@ struct SettingsPresetsView: View {
         guard url.pathExtension.caseInsensitiveCompare("ini") == .orderedSame else {
             message = SettingsPresetsMessage(
                 title: "Preset Import Failed",
-                text: "Select an ARMSX2 preset with the .ini extension."
+                text: "Select an Psxp preset with the .ini extension."
             )
             return
         }

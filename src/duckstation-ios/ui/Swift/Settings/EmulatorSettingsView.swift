@@ -129,12 +129,12 @@ struct EmulatorSettingsView: View {
                     "settings.emulator.open-stik-debug"
                 )
 
-                Text(settings.localized("Select the same script here that you run in StikDebug/StosDebug. This only changes the debugger breakpoint protocol used to prepare JIT memory. Fully close and relaunch ARMSX2 after switching scripts."))
+                Text(settings.localized("Select the same script here that you run in StikDebug/StosDebug. This only changes the debugger breakpoint protocol used to prepare JIT memory. Fully close and relaunch Psxp after switching scripts."))
                     .font(.caption)
                     .foregroundStyle(.secondary)
 
                 if stikDebugOpenFailed {
-                    Text(settings.localized("Open StikDebug/StosDebug manually, then run the selected script and relaunch ARMSX2."))
+                    Text(settings.localized("Open StikDebug/StosDebug manually, then run the selected script and relaunch Psxp."))
                         .font(.caption)
                         .foregroundStyle(.orange)
                 }
@@ -220,7 +220,7 @@ struct EmulatorSettingsView: View {
                     .controllerAccessibilityTargetID(
                         "settings.emulator.host-filesystem"
                     )
-                Text(settings.localized("Allows PS2 homebrew and ELF tools to access files through the host: device. This is separate from USB/SSD game storage, is off by default, and takes effect on next VM boot."))
+                Text(settings.localized("Allows PS1 homebrew and ELF tools to access files through the host: device. This is separate from USB/SSD game storage, is off by default, and takes effect on next VM boot."))
                     .font(.caption)
                     .foregroundStyle(.secondary)
             }
@@ -308,7 +308,7 @@ struct EmulatorSettingsView: View {
                         .controllerAccessibilityTargetID(
                             "settings.emulator.emulation-only-disable-retro-achievements"
                         )
-                    Toggle(settings.localized("Disable PCSX2 Input Recording"), isOn: $settings.emulationOnlyDisableInputRecording)
+                    Toggle(settings.localized("Disable Psxp Input Recording"), isOn: $settings.emulationOnlyDisableInputRecording)
                         .controllerAccessibilityTargetID(
                             "settings.emulator.emulation-only-disable-input-recording"
                         )

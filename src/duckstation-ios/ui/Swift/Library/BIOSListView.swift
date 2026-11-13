@@ -747,7 +747,7 @@ struct BIOSListView: View {
         if bios.valid {
             library.select(bios)
         } else {
-            fileImporter.lastImportMessage = "\(bios.fileName) is visible in your BIOS folder, but it is not a bootable PS2 BIOS. Keep it if it is a companion ROM, and select a valid boot BIOS as default."
+            fileImporter.lastImportMessage = "\(bios.fileName) is visible in your BIOS folder, but it is not a bootable PS1 BIOS. Keep it if it is a companion ROM, and select a valid boot BIOS as default."
             fileImporter.showImportAlert = true
         }
     }
@@ -860,7 +860,7 @@ struct BIOSListView: View {
                       !urls.isEmpty {
                 let message = [
                     importMessage,
-                    "No bootable PS2 BIOS was found. Import a valid PS2 BIOS dump before starting games."
+                    "No bootable PS1 BIOS was found. Import a valid PS1 BIOS dump before starting games."
                 ]
                 .compactMap { $0 }
                 .joined(separator: "\n")
@@ -906,17 +906,17 @@ struct BIOSListView: View {
         let fileMessage: String
         let setupMessage: String
         if nonBootableFileNames.count == 1 {
-            fileMessage = "\(nonBootableFileNames[0]) is in your BIOS folder, but it is not a bootable PS2 BIOS. It may be a companion ROM or unsupported BIOS-related file."
+            fileMessage = "\(nonBootableFileNames[0]) is in your BIOS folder, but it is not a bootable PS1 BIOS. It may be a companion ROM or unsupported BIOS-related file."
             setupMessage = "A bootable BIOS is already installed, but this selected file cannot be used to boot games."
         } else {
-            fileMessage = "These selected files are in your BIOS folder, but they are not bootable PS2 BIOS files: \(nonBootableFileNames.joined(separator: ", ")). They may be companion ROMs or unsupported BIOS-related files."
+            fileMessage = "These selected files are in your BIOS folder, but they are not bootable PS1 BIOS files: \(nonBootableFileNames.joined(separator: ", ")). They may be companion ROMs or unsupported BIOS-related files."
             setupMessage = "A bootable BIOS is already installed, but these files cannot be used to boot games."
         }
 
         if bioses.contains(where: { $0.valid }) {
             return "\(fileMessage)\n\(setupMessage)"
         }
-        return "\(fileMessage)\nNo bootable PS2 BIOS was found. Import a valid PS2 BIOS dump before starting games."
+        return "\(fileMessage)\nNo bootable PS1 BIOS was found. Import a valid PS1 BIOS dump before starting games."
     }
 
     @ViewBuilder

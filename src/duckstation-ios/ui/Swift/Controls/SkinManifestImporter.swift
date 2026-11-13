@@ -192,7 +192,7 @@ enum SkinManifestImporter {
         if !pdfAssets.isEmpty {
             let message = "PDF control art is not rendered in manifest v2.0: \(pdfAssets.joined(separator: ", "))"
             warnings.append(message)
-            NSLog("[ARMSX2 iOS Skins] %@", message)
+            NSLog("[Psxp Skins] %@", message)
         }
         return InstallValidation(errors: errors, warnings: warnings)
     }

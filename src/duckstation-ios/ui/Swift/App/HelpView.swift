@@ -31,70 +31,80 @@ private enum HelpTopic: Hashable, Identifiable {
     }
 }
 
+// Psxp: PS1 guide.
+// The guide is built once, from the main thread, the first time Help is shown.
+private func h(_ en: String, _ ar: String) -> String {
+    Thread.isMainThread ? MainActor.assumeIsolated { DSLanguage.text(en, ar) }
+        : ((Locale.preferredLanguages.first ?? "en").hasPrefix("ar") ? ar : en)
+}
+
 private let helpData: [HelpSection] = [
-    HelpSection(title: "Settings Guide", icon: "gearshape", items: [
+    HelpSection(title: h("Getting Started", "البداية"), icon: "play.circle", items: [
         HelpItem(
-            question: "EE / IOP / VU0 / VU1 (JIT vs Interpreter)",
-            answer: "JIT (Recompiler) is much faster. Interpreter is slower but more stable. If a game crashes or behaves incorrectly, try switching individual components to Interpreter. Changes take effect on next boot."
+            question: h("BIOS", "البايوس"),
+            answer: h("Import a PS1 BIOS dumped from your own console (for example SCPH-1001 for USA, SCPH-5500 for Japan, SCPH-7502 for Europe). Psxp picks the BIOS that matches each game's region automatically.",
+                      "استورد بايوس PS1 مستخرجاً من جهازك (مثل SCPH-1001 الأمريكي أو SCPH-5500 الياباني أو SCPH-7502 الأوروبي). يختار Psxp البايوس المناسب لمنطقة كل لعبة تلقائياً.")
         ),
         HelpItem(
-            question: "Fast Boot",
-            answer: "Skips the PS2 BIOS intro and boots the game directly. Some games require this OFF to initialize correctly (e.g. missing 3D graphics)."
+            question: h("Game formats", "صيغ الألعاب"),
+            answer: h("CUE/BIN, CHD, PBP, M3U (multi-disc), ISO, IMG, ECM, MDS/MDF and PS-EXE. For BIN games, import the .cue file too.",
+                      "CUE/BIN و CHD و PBP و M3U (الألعاب متعددة الأقراص) و ISO و IMG و ECM و MDS/MDF و PS-EXE. لألعاب BIN استورد ملف cue معها.")
         ),
         HelpItem(
-            question: "Fastmem",
-            answer: "Speeds up EE memory access via direct mapping. Disable if 3D graphics are broken. Requires app restart."
+            question: h("Multi-disc games", "الألعاب متعددة الأقراص"),
+            answer: h("Use an .m3u playlist or open the in-game menu and choose Change Disc.",
+                      "استخدم ملف m3u، أو افتح قائمة اللعبة واختر تغيير القرص.")
         ),
         HelpItem(
-            question: "MTVU",
-            answer: "Offloads VU1 processing to a separate thread. Improves performance on multi-core devices, but may cause instability in some games."
-        ),
-        HelpItem(
-            question: "Internal Resolution",
-            answer: "0.25x, 0.5x, and 0.75x are performance modes for heavy games. 1x is native PS2 resolution. 2x and higher look sharper but significantly increase GPU load."
-        ),
-        HelpItem(
-            question: "Texture packs",
-            answer: "Settings > Texture Packs downloads packs from the shared catalog or imports a zip or tar.zst. They go to Documents/textures/[Game Serial]/replacements/. The same page can dump the textures a game uses to Documents/textures/[Game Serial]/dumps/. Dumping is for creators and can slow games down, so leave it off unless you are building a pack."
-        ),
-        HelpItem(
-            question: "Frame Limiter",
-            answer: "Limits display presentation to the selected FPS target while CPU, audio, and game timing remain at 100%. Turning it off presents every available frame and can increase heat and battery use."
-        ),
-        HelpItem(
-            question: "Patches and cheats",
-            answer: "Enable GameDB patches for built-in compatibility fixes. PNACH cheats can be imported from the in-game quick menu; ARMSX2 iOS renames them to the current game's Serial_CRC.pnach and keeps // comments compatible with the core parser."
-        ),
-        HelpItem(
-            question: "Memory cards",
-            answer: "The Memory Cards settings page can create 8 MB, 16 MB, 32 MB, 64 MB, or folder memory cards, then assign them to Slot 1 or Slot 2. Slot changes apply on next boot."
-        ),
-        HelpItem(
-            question: "RetroAchievements",
-            answer: "Enable RetroAchievements from Settings, then log in with your RetroAchievements account. The status panel shows whether the client is active, which game is being tracked, achievement progress, points, leaderboards, and rich presence. Hardcore mode is core-enforced and can restrict cheats, save states, and other non-hardcore features."
-        ),
-        HelpItem(
-            question: "VSync Queue Size",
-            answer: "Number of pre-rendered frames. Higher values reduce frame drops but increase input latency. Default: 4."
+            question: h("Covers", "الأغلفة"),
+            answer: h("Covers download automatically for PS1 games using the game serial (for example SLUS-00594). You can also import your own images from the Covers menu.",
+                      "تُحمّل الأغلفة تلقائياً لألعاب PS1 حسب رقم اللعبة (مثل SLUS-00594)، ويمكنك استيراد صورك من قائمة الأغلفة.")
         ),
     ]),
-    HelpSection(title: "Overlay", icon: "speedometer", items: [
+    HelpSection(title: h("Playing", "اللعب"), icon: "gamecontroller", items: [
         HelpItem(
-            question: "Overlay presets",
-            answer: "OFF hides the overlay. Simple shows FPS, speed, CPU, and indicators. Detail adds VPS, GPU, and resolution. Full enables the Android-style diagnostic set including GS stats, settings, inputs, frame times, version, and hardware info."
+            question: h("Controller", "يد التحكم"),
+            answer: h("Port 1 is a DualShock by default. Games without analog support stay in digital mode, and the stick then moves the D-Pad. Old games that need the original pad can use Digital Pad in Settings › PS1 Controller.",
+                      "المنفذ 1 يعمل كـ DualShock افتراضياً. الألعاب التي لا تدعم الأنالوج تبقى على الوضع الرقمي وتحرّك العصا الأسهم. الألعاب القديمة التي تحتاج اليد الأصلية اختر لها اليد الرقمية من الإعدادات › يد تحكم PS1.")
         ),
         HelpItem(
-            question: "In-game toggle",
-            answer: "Tap the menu button (top-right) during gameplay and select Show/Hide Overlay. This toggles visibility without changing your preset."
+            question: h("Save states", "حفظ الحالة"),
+            answer: h("Open the in-game menu to save or load any slot. Your progress is also kept automatically when you leave a game.",
+                      "افتح قائمة اللعبة للحفظ أو التحميل من أي خانة. ويُحفظ تقدمك تلقائياً عند الخروج من اللعبة.")
+        ),
+        HelpItem(
+            question: h("Memory cards", "بطاقات الذاكرة"),
+            answer: h("Each game gets its own memory card by default, so saves never run out of space. You can change this in Settings › Memory Cards.",
+                      "كل لعبة لها بطاقة ذاكرة خاصة افتراضياً فلا تمتلئ البطاقة أبداً. يمكنك تغيير ذلك من الإعدادات › بطاقات الذاكرة.")
+        ),
+        HelpItem(
+            question: h("Cheats", "الغشّات"),
+            answer: h("In a game, open the menu and choose Cheats. Load codes from the built-in database, type GameShark codes, or import a .cht file. Cheats are saved per game.",
+                      "أثناء اللعب افتح القائمة واختر الغشّات. حمّل الأكواد من قاعدة البيانات المدمجة، أو اكتب أكواد GameShark، أو استورد ملف cht. تُحفظ الغشّات لكل لعبة.")
         ),
     ]),
-    HelpSection(title: "Supported Formats", icon: "doc.circle", items: [
-        HelpItem(question: "Game formats", answer: "ISO, CHD, IMG, BIN, CSO, ZSO, GZ, ELF"),
-        HelpItem(question: "BIOS formats", answer: "BIN, ROM (dumped from your own PS2)"),
-        HelpItem(question: "Disc swapping", answer: "During gameplay, open the quick menu and choose Change Disc. ARMSX2 iOS can eject the current disc or switch to any imported ISO/CHD/IMG/BIN/CSO/ZSO/GZ disc image."),
+    HelpSection(title: h("Graphics", "الرسوميات"), icon: "sparkles.tv", items: [
         HelpItem(
-            question: "Game covers",
-            answer: "Games default to a cover grid, with a toolbar button to switch back to list view. Open the Covers menu in Games to import local images, download missing covers, or edit the online Cover Source template. Templates support ${serial}, ${title}, and ${filetitle}; the default example is https://raw.githubusercontent.com/xlenore/ps2-covers/main/covers/default/${serial}.jpg. ARMSX2 iOS scans Documents/armsx2_covers, Documents/covers, the game folder, and Documents for JPG, PNG, WebP, HEIC, or HEIF images named after the game file, file stem, game title, or serial-like names such as SLUS-20312. This also works for CHD games when metadata can be resolved."
+            question: h("Resolution scale", "دقة العرض"),
+            answer: h("1x is the original PS1 resolution. Higher values look sharper and use more power.",
+                      "1x هي دقة PS1 الأصلية. القيم الأعلى أوضح لكنها تستهلك طاقة أكثر.")
+        ),
+        HelpItem(
+            question: h("PGXP", "PGXP"),
+            answer: h("Fixes the wobbly polygons and warping textures of the original hardware. Turn it off if a game shows glitches.",
+                      "يصلح اهتزاز المضلعات وتشوّه الخامات الموجود في الجهاز الأصلي. أطفئه إذا ظهرت مشاكل في لعبة.")
+        ),
+        HelpItem(
+            question: h("Texture replacement", "استبدال الخامات"),
+            answer: h("Put PNG replacements in Files › Psxp › textures › [Game Serial] and turn on replacement in Settings › Texture Replacement.",
+                      "ضع ملفات PNG في الملفات › Psxp › textures › [رقم اللعبة] وفعّل الاستبدال من الإعدادات › استبدال الخامات.")
+        ),
+    ]),
+    HelpSection(title: h("Troubleshooting", "حل المشاكل"), icon: "wrench.and.screwdriver", items: [
+        HelpItem(
+            question: h("A game crashes or freezes", "اللعبة تتوقف أو تعلق"),
+            answer: h("Check that the BIOS region matches the game, import the .cue for BIN games, and try turning off PGXP or CPU overclock. The log is in Files › Psxp › duckstation.log and crashes are written to crash.txt.",
+                      "تأكد أن منطقة البايوس تطابق اللعبة، واستورد ملف cue لألعاب BIN، وجرّب إطفاء PGXP أو تسريع المعالج. السجل موجود في الملفات › Psxp › duckstation.log والأعطال تُكتب في crash.txt.")
         ),
     ]),
 ]
@@ -311,7 +321,7 @@ struct HelpView: View {
         let bundle = Bundle.main
         let appName = bundle.object(forInfoDictionaryKey: "CFBundleDisplayName") as? String
             ?? bundle.object(forInfoDictionaryKey: "CFBundleName") as? String
-            ?? "ARMSX2 iOS"
+            ?? "Psxp"
         let appVersion = bundle.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String ?? "Unknown"
         let buildNumber = bundle.object(forInfoDictionaryKey: "CFBundleVersion") as? String ?? "Unknown"
         let device = UIDevice.current

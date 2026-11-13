@@ -320,7 +320,7 @@ final class MenuAudioPackManager {
             previewSound = sound
         } catch {
             NSLog(
-                "[ARMSX2 UI Audio] %@ preview failed: %@",
+                "[Psxp UI Audio] %@ preview failed: %@",
                 sound.rawValue,
                 error.localizedDescription
             )
@@ -1034,7 +1034,7 @@ final class MenuAudioPackManager {
                 }
             } catch {
                 NSLog(
-                    "[ARMSX2 UI Audio] %@ could not be preloaded: %@",
+                    "[Psxp UI Audio] %@ could not be preloaded: %@",
                     sound.rawValue,
                     error.localizedDescription
                 )
@@ -1079,7 +1079,7 @@ final class MenuAudioPackManager {
             // Do not permanently cache a failed activation. A later foreground
             // transition or controller event can then recover the session.
             audioSessionPrepared = false
-            NSLog("[ARMSX2 UI Audio] audio session setup failed: %@", error.localizedDescription)
+            NSLog("[Psxp UI Audio] audio session setup failed: %@", error.localizedDescription)
             return false
         }
 #else

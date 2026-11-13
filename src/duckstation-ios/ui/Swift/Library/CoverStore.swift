@@ -136,7 +136,7 @@ final class CoverStore {
                 lastCoverMessage = "Set a cover URL template first."
                 showCoverAlert = true
             } else {
-                NSLog("[ARMSX2 iOS Covers] auto-download skipped: cover URL template is empty")
+                NSLog("[Psxp Covers] auto-download skipped: cover URL template is empty")
             }
             return CoverDownloadSummary(downloaded: 0)
         }
@@ -146,7 +146,7 @@ final class CoverStore {
                 lastCoverMessage = "Cover download already in progress."
                 showCoverAlert = true
             } else {
-                NSLog("[ARMSX2 iOS Covers] auto-download skipped: cover download already in progress")
+                NSLog("[Psxp Covers] auto-download skipped: cover download already in progress")
             }
             return CoverDownloadSummary(downloaded: 0)
         }
@@ -193,7 +193,7 @@ final class CoverStore {
                 : summary
             showCoverAlert = true
         } else {
-            NSLog("[ARMSX2 iOS Covers] auto-download finished downloaded=%d skipped=%d failed=%d", downloaded, skipped, failed)
+            NSLog("[Psxp Covers] auto-download finished downloaded=%d skipped=%d failed=%d", downloaded, skipped, failed)
         }
         return CoverDownloadSummary(downloaded: downloaded)
     }
@@ -233,10 +233,10 @@ final class CoverStore {
                     try fileManager.copyItem(at: sourceURL, to: destination)
                 }
                 imported.append(sourceURL.lastPathComponent)
-                NSLog("[ARMSX2 iOS Covers] imported %@ -> %@", sourceURL.lastPathComponent, destination.path)
+                NSLog("[Psxp Covers] imported %@ -> %@", sourceURL.lastPathComponent, destination.path)
             } catch {
                 failed.append("\(sourceURL.lastPathComponent): \(error.localizedDescription)")
-                NSLog("[ARMSX2 iOS Covers] import failed %@ -> %@ error=%@", sourceURL.lastPathComponent, destination.path, error.localizedDescription)
+                NSLog("[Psxp Covers] import failed %@ -> %@ error=%@", sourceURL.lastPathComponent, destination.path, error.localizedDescription)
             }
         }
 
@@ -276,10 +276,10 @@ final class CoverStore {
                 try data.write(to: destination, options: .atomic)
             }
             message = "Assigned cover from Photos."
-            NSLog("[ARMSX2 iOS Covers] imported photo -> %@", destination.path)
+            NSLog("[Psxp Covers] imported photo -> %@", destination.path)
         } catch {
             message = "Cover import failed: \(error.localizedDescription)"
-            NSLog("[ARMSX2 iOS Covers] photo import failed -> %@ error=%@", destination.path, error.localizedDescription)
+            NSLog("[Psxp Covers] photo import failed -> %@ error=%@", destination.path, error.localizedDescription)
         }
 
         lastCoverMessage = message
@@ -305,7 +305,7 @@ final class CoverStore {
                     try fileManager.removeItem(at: file)
                     removed += 1
                 } catch {
-                    NSLog("[ARMSX2 iOS Covers] remove failed %@ error=%@", file.path, error.localizedDescription)
+                    NSLog("[Psxp Covers] remove failed %@ error=%@", file.path, error.localizedDescription)
                 }
             }
         }
@@ -467,7 +467,7 @@ final class CoverStore {
 
             let (data, response) = try await URLSession.shared.data(for: request)
             guard let http = response as? HTTPURLResponse, http.statusCode == 200, !data.isEmpty else {
-                NSLog("[ARMSX2 iOS Covers] HTTP miss %@", remoteURL.absoluteString)
+                NSLog("[Psxp Covers] HTTP miss %@", remoteURL.absoluteString)
                 return false
             }
 
@@ -486,7 +486,7 @@ final class CoverStore {
             try fileManager.moveItem(at: temp, to: target)
             return true
         } catch {
-            NSLog("[ARMSX2 iOS Covers] download failed %@ error=%@", remoteURL.absoluteString, error.localizedDescription)
+            NSLog("[Psxp Covers] download failed %@ error=%@", remoteURL.absoluteString, error.localizedDescription)
             return false
         }
     }

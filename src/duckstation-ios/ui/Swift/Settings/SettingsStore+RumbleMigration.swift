@@ -23,7 +23,7 @@ extension SettingsStore {
         if stored >= 0.0 {
             let rescaled = min(max(stored * phoneRumbleBaselineSetting, 0.0), 1.0)
             ARMSX2Bridge.setINIFloat("ARMSX2iOS/UI", key: "PhoneRumbleStrength", value: rescaled)
-            NSLog("[ARMSX2 iOS Settings] Phone rumble migration: %.2f -> %.2f", stored, rescaled)
+            NSLog("[Psxp Settings] Phone rumble migration: %.2f -> %.2f", stored, rescaled)
         }
 
         ARMSX2Bridge.setINIBool("ARMSX2iOS/Migrations", key: "PhoneRumbleStrengthRescaleV1", value: true)

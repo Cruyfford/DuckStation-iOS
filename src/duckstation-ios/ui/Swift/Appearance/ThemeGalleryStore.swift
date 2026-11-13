@@ -322,7 +322,7 @@ private enum AppearanceThemeTransferError: LocalizedError {
     var errorDescription: String? {
         switch self {
         case .invalidDocument:
-            return "This JSON file is not an ARMSX2 theme preset."
+            return "This JSON file is not an Psxp theme preset."
         case .unsupportedVersion(let version):
             return "This theme preset uses unsupported format version \(version)."
         case .couldNotSave:

@@ -53,12 +53,12 @@ final class ExternalGameLibrary: @unchecked Sendable {
 	        let cloudProvider = Self.isLikelyCloudProvider(standardizedURL)
 	        let scanDisabled = isDirectory && cloudProvider
 	        guard isDirectory || isGameFile else {
-	            NSLog("[ARMSX2 iOS External Games] rejected unsupported location path=%@", standardizedURL.path)
-	            return "External location could not be added. Select a folder or a supported PS2 image."
+	            NSLog("[Psxp External Games] rejected unsupported location path=%@", standardizedURL.path)
+	            return "External location could not be added. Select a folder or a supported PS1 image."
 	        }
 	        if cloudProvider {
-	            NSLog("[ARMSX2 iOS External Games] rejected cloud provider direct access path=%@", standardizedURL.path)
-	            return "Google Drive cannot be used as direct external storage.\n\nCloud files are not guaranteed to be downloaded as stable, seekable files. Use Import Games to copy the ISO into ARMSX2 first."
+	            NSLog("[Psxp External Games] rejected cloud provider direct access path=%@", standardizedURL.path)
+	            return "Google Drive cannot be used as direct external storage.\n\nCloud files are not guaranteed to be downloaded as stable, seekable files. Use Import Games to copy the ISO into Psxp first."
 	        }
 
         do {
@@ -89,14 +89,14 @@ final class ExternalGameLibrary: @unchecked Sendable {
             reload()
             NotificationCenter.default.post(name: Self.didChangeNotification, object: nil)
 
-            NSLog("[ARMSX2 iOS External Games] added %@ path=%@ securityScoped=%d scanDisabled=%d",
+            NSLog("[Psxp External Games] added %@ path=%@ securityScoped=%d scanDisabled=%d",
                   isDirectory ? "folder" : "file", path, accessing ? 1 : 0, scanDisabled ? 1 : 0)
             if scanDisabled {
                 return "External folder saved: \(displayName)\nCloud folders like Google Drive cannot be scanned safely. Select the ISO file itself to add it as a playable external game."
             }
             return isDirectory ? "External game folder added: \(displayName)\nTap Refresh to scan this folder." : "External game added: \(displayName)"
         } catch {
-            NSLog("[ARMSX2 iOS External Games] bookmark failed path=%@ error=%@", standardizedURL.path, error.localizedDescription)
+            NSLog("[Psxp External Games] bookmark failed path=%@ error=%@", standardizedURL.path, error.localizedDescription)
             return "External location could not be added: \(error.localizedDescription)"
         }
     }

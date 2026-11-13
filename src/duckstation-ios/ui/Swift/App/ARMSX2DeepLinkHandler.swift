@@ -24,8 +24,8 @@ enum ARMSX2DeepLinkHandler {
             return true
         }
 
-        showMessage("Unsupported ARMSX2 link: \(url.absoluteString)")
-        NSLog("[ARMSX2 iOS DeepLink] unsupported url=%@", url.absoluteString)
+        showMessage("Unsupported Psxp link: \(url.absoluteString)")
+        NSLog("[Psxp DeepLink] unsupported url=%@", url.absoluteString)
         return true
     }
 
@@ -84,13 +84,13 @@ enum ARMSX2DeepLinkHandler {
     private static func exportLibrary(from url: URL) {
         guard let callback = queryValue(["callback", "callback_url", "return", "return_url", "x-success"], in: url) else {
             showMessage("Library export requested, but no callback URL was provided.")
-            NSLog("[ARMSX2 iOS DeepLink] library export missing callback url=%@", url.absoluteString)
+            NSLog("[Psxp DeepLink] library export missing callback url=%@", url.absoluteString)
             return
         }
 
         // The link chose this callback, so RootView confirms the destination first.
         AppState.shared.pendingLibraryExport = callback
-        NSLog("[ARMSX2 iOS DeepLink] library export awaiting confirmation")
+        NSLog("[Psxp DeepLink] library export awaiting confirmation")
     }
 
     static func performLibraryExport(callback: String) {
@@ -101,12 +101,12 @@ enum ARMSX2DeepLinkHandler {
             let encoded = base64URLEncoded(data)
             guard let callbackURL = callbackURL(base: callback, payload: encoded) else {
                 showMessage("The library callback URL was invalid.")
-                NSLog("[ARMSX2 iOS DeepLink] library export callback invalid")
+                NSLog("[Psxp DeepLink] library export callback invalid")
                 return
             }
 
             UIApplication.shared.open(callbackURL, options: [:]) { didOpen in
-                NSLog("[ARMSX2 iOS DeepLink] library export games=%ld callback open result=%ld", gameCount, didOpen ? 1 : 0)
+                NSLog("[Psxp DeepLink] library export games=%ld callback open result=%ld", gameCount, didOpen ? 1 : 0)
                 if !didOpen {
                     Task { @MainActor in
                         showMessage("The library callback could not be opened.")
@@ -115,7 +115,7 @@ enum ARMSX2DeepLinkHandler {
             }
         } catch {
             showMessage("Library export failed: \(error.localizedDescription)")
-            NSLog("[ARMSX2 iOS DeepLink] library export failed: %@", error.localizedDescription)
+            NSLog("[Psxp DeepLink] library export failed: %@", error.localizedDescription)
         }
     }
 
@@ -142,7 +142,7 @@ enum ARMSX2DeepLinkHandler {
 
         return [
             "schema": "com.armsx2.library.v1",
-            "app": "ARMSX2 iOS",
+            "app": "Psxp",
             "version": ARMSX2Bridge.buildVersion(),
             "generatedAt": ISO8601DateFormatter().string(from: Date()),
             "gameCount": games.count,
@@ -172,18 +172,18 @@ enum ARMSX2DeepLinkHandler {
 
     private static func launchGame(from url: URL) {
         guard let game = queryValue(["game", "iso", "file", "name"], in: url) else {
-            showMessage("ARMSX2 launch link is missing a game filename.")
-            NSLog("[ARMSX2 iOS DeepLink] launch missing game url=%@", url.absoluteString)
+            showMessage("Psxp launch link is missing a game filename.")
+            NSLog("[Psxp DeepLink] launch missing game url=%@", url.absoluteString)
             return
         }
 
         guard let bootName = bootName(forListedName: game) else {
-            showMessage("ARMSX2 could not find \(game).")
-            NSLog("[ARMSX2 iOS DeepLink] launch missing game=%@", game)
+            showMessage("Psxp could not find \(game).")
+            NSLog("[Psxp DeepLink] launch missing game=%@", game)
             return
         }
 
-        NSLog("[ARMSX2 iOS DeepLink] launching game=%@ boot=%@", game, bootName)
+        NSLog("[Psxp DeepLink] launching game=%@ boot=%@", game, bootName)
         AppState.shared.bootGame(isoName: bootName)
     }
 

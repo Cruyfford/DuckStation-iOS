@@ -1138,25 +1138,11 @@ struct SettingsRootView: View {
             "settings.root.language",
             "settings.root.appearance",
             "settings.root.appIcon",
-            "settings.root.emulator",
-            "settings.root.graphics",
         ]
-        result.append("settings.root.shaders")
-        result.append("settings.root.texturePacks")
         result.append(contentsOf: [
-            "settings.root.framePacing",
-            "settings.root.audio",
             "settings.root.gameController",
             "settings.root.virtualPad",
-            "settings.root.localMultiplayer",
-            "settings.root.memoryCards",
-            "settings.root.storage",
-            "settings.root.network",
-            "settings.root.settingsPresets",
-            "settings.root.retroAchievements",
             "settings.root.customSkin",
-            "settings.root.overlay",
-            "settings.root.open-stik-debug",
             "settings.root.licenses",
             "settings.root.help",
         ])
@@ -1222,7 +1208,7 @@ struct SettingsRootView: View {
 
     private var jitStatusSubtitle: String {
         if stikDebugOpenFailed {
-            return "Open StikDebug/StosDebug manually, then run the selected script and relaunch ARMSX2."
+            return "Open StikDebug/StosDebug manually, then run the selected script and relaunch Psxp."
         }
         if jitAvailable {
             return "Access is available. Confirm EE:JIT / IOP:JIT / VU:JIT in the in-game OSD. Current script: \(settings.jitScriptProtocol.label)."
@@ -1302,38 +1288,39 @@ struct SettingsRootView: View {
             AppearanceSettingsView()
         case .appIcon:
             AppIconSettingsView()
+        // Psxp: PS2 panes route to their PS1 equivalents.
         case .emulator:
-            EmulatorSettingsView()
+            DSSettingsCategoryView(category: DSSettingsSchema.emulation)
         case .graphics:
-            GraphicsSettingsView()
+            DSSettingsCategoryView(category: DSSettingsSchema.graphics)
         case .shaders:
-            ShaderSettingsView()
+            DSSettingsCategoryView(category: DSSettingsSchema.display)
         case .texturePacks:
             DSSettingsCategoryView(category: DSSettingsSchema.textures)
         case .framePacing:
-            FramePacingSettingsView()
+            DSSettingsCategoryView(category: DSSettingsSchema.emulation)
         case .audio:
-            AudioSettingsView()
+            DSSettingsCategoryView(category: DSSettingsSchema.audio)
         case .network:
-            NetworkSettingsView()
+            DSUnavailableView(onClose: nil)
         case .memoryCards:
-            MemoryCardSettingsView()
+            DSSettingsCategoryView(category: DSSettingsSchema.memoryCards)
         case .storage:
             StorageSettingsView()
         case .settingsPresets:
-            SettingsPresetsView()
+            DSUnavailableView(onClose: nil)
         case .retroAchievements:
-            RetroAchievementsSettingsView()
+            DSUnavailableView(onClose: nil)
         case .customSkin:
             VirtualPadSettingsView(onOpenPane: openPane)
         case .overlay:
-            OverlaySettingsView()
+            DSSettingsCategoryView(category: DSSettingsSchema.osd)
         case .gameController:
             GamepadSettingsView(onOpenPane: openPane)
         case .controllerMacros:
             ControllerMacrosSettingsView()
         case .localMultiplayer:
-            LocalMultiplayerSettingsView()
+            DSUnavailableView(onClose: nil)
         case .virtualPad:
             VirtualPadSettingsView(onOpenPane: openPane)
         case .help:

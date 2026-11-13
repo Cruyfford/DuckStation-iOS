@@ -587,9 +587,9 @@ enum SkinManifestValidator {
         }
         let declaredTypes = ([primaryType] + supportedTypes).filter { !$0.isEmpty }
         if declaredTypes.isEmpty {
-            result.errors.append(Issue(location: "gameTypeIdentifier", message: "missing; a PS2 game type is required"))
+            result.errors.append(Issue(location: "gameTypeIdentifier", message: "missing; a PS1 game type is required"))
         } else if !declaredTypes.contains(where: { Self.isPS2GameType($0) }) {
-            result.errors.append(Issue(location: "gameTypeIdentifier", message: "not a PS2 skin; expected \"\(SkinManifestV2.ps2GameTypeIdentifier)\" (declared: \(declaredTypes.joined(separator: ", ")))"))
+            result.errors.append(Issue(location: "gameTypeIdentifier", message: "not a PS1 skin; expected \"\(SkinManifestV2.ps2GameTypeIdentifier)\" (declared: \(declaredTypes.joined(separator: ", ")))"))
         }
 
         // preview (optional)

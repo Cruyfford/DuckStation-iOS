@@ -125,7 +125,7 @@ enum BackgroundStorage {
                 try? FileManager.default.removeItem(atPath: primaryPath)
                 primaryMigrated = true
             } catch {
-                NSLog("[ARMSX2 Background] legacy primary migration failed: %@", error.localizedDescription)
+                NSLog("[Psxp Background] legacy primary migration failed: %@", error.localizedDescription)
             }
         }
         if landscapeExists {
@@ -134,7 +134,7 @@ enum BackgroundStorage {
                 try? FileManager.default.removeItem(atPath: landscapePath)
                 landscapeMigrated = true
             } catch {
-                NSLog("[ARMSX2 Background] legacy landscape migration failed: %@", error.localizedDescription)
+                NSLog("[Psxp Background] legacy landscape migration failed: %@", error.localizedDescription)
             }
         }
 

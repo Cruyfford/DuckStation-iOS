@@ -16,7 +16,7 @@ enum BuiltInSettingsPreset: String, CaseIterable, Identifiable {
     var summary: String {
         switch self {
         case .defaultPreset:
-            return "Restores ARMSX2 settings to their original defaults."
+            return "Restores Psxp settings to their original defaults."
         case .ultraQuality:
             return "Uses 2x internal resolution with FXAA and CAS Sharpening for maximum image quality."
         case .highQuality:

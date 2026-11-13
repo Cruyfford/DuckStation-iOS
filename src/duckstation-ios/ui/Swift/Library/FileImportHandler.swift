@@ -186,21 +186,21 @@ final class FileImportHandler {
 
         if preferredDestination == .game {
             guard Self.gameExtensions.contains(ext) else {
-                NSLog("[ARMSX2 iOS Import] unsupported game file: %@", fileName)
+                NSLog("[Psxp Import] unsupported game file: %@", fileName)
                 return .unsupported(message: Self.unsupportedGameImportMessage(for: fileName))
             }
             destDir = ARMSX2Bridge.isoDirectory()
             category = "Game"
         } else if preferredDestination == .bios {
             guard Self.biosExtensions.contains(ext) else {
-                NSLog("[ARMSX2 iOS Import] unsupported BIOS file: %@", fileName)
+                NSLog("[Psxp Import] unsupported BIOS file: %@", fileName)
                 return .unsupported(message: Self.unsupportedBIOSImportMessage(for: fileName))
             }
 
             let attrs = try? FileManager.default.attributesOfItem(atPath: url.path)
             let size = attrs?[.size] as? UInt64 ?? 0
             if size > 0 && size > Self.biosSizeThreshold {
-                NSLog("[ARMSX2 iOS Import] rejecting oversized BIOS candidate: %@ size=%llu", fileName, size)
+                NSLog("[Psxp Import] rejecting oversized BIOS candidate: %@ size=%llu", fileName, size)
                 return .failure(Self.oversizedBIOSImportMessage(for: fileName))
             }
 
@@ -221,7 +221,7 @@ final class FileImportHandler {
                 category = "BIOS"
             }
         } else {
-            NSLog("[ARMSX2 iOS Import] unsupported file: %@", fileName)
+            NSLog("[Psxp Import] unsupported file: %@", fileName)
             return .unsupported(message: Self.unsupportedAutomaticImportMessage(for: fileName))
         }
 
@@ -239,11 +239,11 @@ final class FileImportHandler {
                 try FileManager.default.removeItem(atPath: destPath)
             }
             try ImportFileCopier.copy(from: url, to: URL(fileURLWithPath: destPath))
-            NSLog("[ARMSX2 iOS Import] %@ imported: %@ -> %@", category, fileName, destPath)
+            NSLog("[Psxp Import] %@ imported: %@ -> %@", category, fileName, destPath)
             let importedGame = category == "Game" ? ImportedGame(name: fileName, fileURL: URL(fileURLWithPath: destPath)) : nil
             return .success("\(category) imported: \(fileName)", importedGame: importedGame)
         } catch {
-            NSLog("[ARMSX2 iOS Import] failed: %@ -> %@ error=%@", fileName, destPath, error.localizedDescription)
+            NSLog("[Psxp Import] failed: %@ -> %@ error=%@", fileName, destPath, error.localizedDescription)
             return .failure("\(fileName): \(error.localizedDescription)")
         }
     }
@@ -251,7 +251,7 @@ final class FileImportHandler {
     private func importPNACHFile(_ url: URL, asCheat: Bool) -> ImportResult {
         let fileName = url.lastPathComponent
         if !Self.pnachExtensions.contains(url.pathExtension.lowercased()) {
-            NSLog("[ARMSX2 iOS Import] PNACH file has non-standard extension, attempting text import: %@", fileName)
+            NSLog("[Psxp Import] PNACH file has non-standard extension, attempting text import: %@", fileName)
         }
 
         guard let name = ARMSX2Bridge.currentGameISOName(), !name.isEmpty else {
@@ -272,7 +272,7 @@ final class FileImportHandler {
         let outcome = PatchStore.shared.writePatch(text: installText, forISO: name, asCheat: asCheat, autoEnable: true, source: .local)
         switch outcome {
         case .success:
-            NSLog("[ARMSX2 iOS Import] PNACH imported: %@", fileName)
+            NSLog("[Psxp Import] PNACH imported: %@", fileName)
             return .success("PNACH imported for \(name)")
         case .invalid(let reason):
             return .failure(Self.failedPNACHImportMessage(for: fileName, errorDescription: reason))
@@ -290,11 +290,11 @@ final class FileImportHandler {
     }
 
     static func failedGamePickerMessage(errorDescription: String) -> String {
-        "Game import failed. Try importing a supported PS2 game image.\n\(errorDescription)"
+        "Game import failed. Try importing a supported PS1 game image.\n\(errorDescription)"
     }
 
     static func failedBIOSPickerMessage(errorDescription: String) -> String {
-        "BIOS import failed. Try importing a PS2 BIOS dump.\n\(errorDescription)"
+        "BIOS import failed. Try importing a PS1 BIOS dump.\n\(errorDescription)"
     }
 
     static func failedPNACHPickerMessage(errorDescription: String) -> String {
@@ -312,19 +312,19 @@ final class FileImportHandler {
     }
 
     private static func unsupportedGameImportMessage(for fileName: String) -> String {
-        "This does not look like a supported game image: \(fileName). Try importing a PS2 game file such as \(formatList(gameExtensionList))."
+        "This does not look like a supported game image: \(fileName). Try importing a PS1 game file such as \(formatList(gameExtensionList))."
     }
 
     private static func unsupportedBIOSImportMessage(for fileName: String) -> String {
-        "This does not look like a PS2 BIOS file: \(fileName). Try importing a BIOS dump such as \(formatList(biosExtensionList))."
+        "This does not look like a PS1 BIOS file: \(fileName). Try importing a BIOS dump such as \(formatList(biosExtensionList))."
     }
 
     private static func oversizedBIOSImportMessage(for fileName: String) -> String {
-        "This file is too large to be a normal PS2 BIOS dump: \(fileName). Try importing a BIOS dump between 1 MB and 50 MB, usually \(formatList(biosExtensionList))."
+        "This file is too large to be a normal PS1 BIOS dump: \(fileName). Try importing a BIOS dump between 1 MB and 50 MB, usually \(formatList(biosExtensionList))."
     }
 
     private static func unsupportedAutomaticImportMessage(for fileName: String) -> String {
-        "ARMSX2 could not import \(fileName). Try importing it from the matching Games, BIOS, or PNACH patch option."
+        "Psxp could not import \(fileName). Try importing it from the matching Games, BIOS, or PNACH patch option."
     }
 
     private static func unreadablePNACHImportMessage(for fileName: String) -> String {

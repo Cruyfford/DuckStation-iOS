@@ -21,7 +21,7 @@ enum SettingsPresetFileError: LocalizedError {
         case .unsupportedVersion(let version):
             return "This preset uses unsupported format version \(version)."
         case .noSupportedSettings:
-            return "The file does not contain supported ARMSX2 preset settings."
+            return "The file does not contain supported Psxp preset settings."
         case .invalidValue(let section, let key, let value):
             return "Invalid value \"\(value)\" for [\(section)] \(key)."
         }
@@ -40,7 +40,7 @@ enum SettingsPresetFile {
             .replacingOccurrences(of: "\r", with: " ")
             .replacingOccurrences(of: "\n", with: " ")
             .trimmingCharacters(in: .whitespaces)
-        let effectiveName = safeName.isEmpty ? "ARMSX2 Settings Preset" : safeName
+        let effectiveName = safeName.isEmpty ? "Psxp Settings Preset" : safeName
         let text = """
         ; ARMSX2 iOS Settings Preset
         ; Unknown sections and keys are ignored by newer versions.

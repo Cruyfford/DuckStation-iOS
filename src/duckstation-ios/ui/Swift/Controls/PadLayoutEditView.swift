@@ -484,7 +484,7 @@ struct PadLayoutEditView: View {
             try data.write(to: url, options: .atomic)
             layoutExportItem = ShareSheetItem(url: url)
         } catch {
-            NSLog("[ARMSX2 iOS Layout] export failed: %@", error.localizedDescription)
+            NSLog("[Psxp Layout] export failed: %@", error.localizedDescription)
         }
     }
 

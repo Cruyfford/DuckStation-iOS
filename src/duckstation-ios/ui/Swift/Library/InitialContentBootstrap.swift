@@ -30,7 +30,7 @@ final class InitialContentBootstrap {
     /// PRESETS/logo.png and PRESETS/audiopack.zip.
     func selectARMSX2Folder(_ url: URL) async -> String {
         guard !isRunning else {
-            return "The selected ARMSX2 folder is already being scanned."
+            return "The selected Psxp folder is already being scanned."
         }
         isRunning = true
         defer { isRunning = false }
@@ -58,7 +58,7 @@ final class InitialContentBootstrap {
 
             try saveBookmark(for: selectedURL)
             let displayName = selectedURL.lastPathComponent.isEmpty
-                ? "ARMSX2"
+                ? "Psxp"
                 : selectedURL.lastPathComponent
             UserDefaults.standard.set(displayName, forKey: Self.displayNameKey)
             selectedFolderName = displayName
@@ -66,22 +66,22 @@ final class InitialContentBootstrap {
             return await importContents(from: selectedURL, importsLogoAndAudioPack: true)
         } catch {
             NSLog(
-                "[ARMSX2 iOS Folder] selection failed path=%@ securityScoped=%d error=%@",
+                "[Psxp Folder] selection failed path=%@ securityScoped=%d error=%@",
                 selectedURL.path,
                 accessing ? 1 : 0,
                 error.localizedDescription
             )
-            return "ARMSX2 folder access failed: \(error.localizedDescription)"
+            return "Psxp folder access failed: \(error.localizedDescription)"
         }
     }
 
     /// Resolves the saved bookmark and scans while its security scope is active.
     func scanSelectedFolder() async -> String {
         guard !isRunning else {
-            return "The selected ARMSX2 folder is already being scanned."
+            return "The selected Psxp folder is already being scanned."
         }
         guard let bookmarkData = UserDefaults.standard.data(forKey: Self.bookmarkKey) else {
-            return "Select the ARMSX2 folder first."
+            return "Select the Psxp folder first."
         }
 
         isRunning = true
@@ -117,13 +117,13 @@ final class InitialContentBootstrap {
 
             if isStale {
                 try saveBookmark(for: rootURL)
-                NSLog("[ARMSX2 iOS Folder] refreshed stale bookmark path=%@", rootURL.path)
+                NSLog("[Psxp Folder] refreshed stale bookmark path=%@", rootURL.path)
             }
 
             return await importContents(from: rootURL, importsLogoAndAudioPack: false)
         } catch {
-            NSLog("[ARMSX2 iOS Folder] bookmark scan failed error=%@", error.localizedDescription)
-            return "The saved ARMSX2 folder could not be opened. Select it again to renew access.\n\(error.localizedDescription)"
+            NSLog("[Psxp Folder] bookmark scan failed error=%@", error.localizedDescription)
+            return "The saved Psxp folder could not be opened. Select it again to renew access.\n\(error.localizedDescription)"
         }
     }
 
@@ -132,7 +132,7 @@ final class InitialContentBootstrap {
         defaults.removeObject(forKey: Self.bookmarkKey)
         defaults.removeObject(forKey: Self.displayNameKey)
         selectedFolderName = nil
-        NSLog("[ARMSX2 iOS Folder] removed saved folder access")
+        NSLog("[Psxp Folder] removed saved folder access")
     }
 
     private var bookmarkCreationOptions: URL.BookmarkCreationOptions {
@@ -212,7 +212,7 @@ final class InitialContentBootstrap {
         }
 
         NSLog(
-            "[ARMSX2 iOS Folder] complete root=%@ BIOS candidates=%d copied=%d games discovered=%d imported=%d skipped=%d failed=%d covers=%d skins=%d skinSkipped=%d skinFailed=%d defaultSkin=%@ logoFound=%d logoImported=%d audioPackFound=%d audioPackImported=%d presets=%@",
+            "[Psxp Folder] complete root=%@ BIOS candidates=%d copied=%d games discovered=%d imported=%d skipped=%d failed=%d covers=%d skins=%d skinSkipped=%d skinFailed=%d defaultSkin=%@ logoFound=%d logoImported=%d audioPackFound=%d audioPackImported=%d presets=%@",
             rootDirectory.path,
             preparation.biosCandidates,
             preparation.biosCopied,
@@ -233,7 +233,7 @@ final class InitialContentBootstrap {
         )
 
         var summary = [
-            "ARMSX2 folder scan complete.",
+            "Psxp folder scan complete.",
             "BIOS: \(preparation.biosCopied) imported, \(preparation.biosCandidates) found.",
             "Games: \(gameImport.imported) imported, \(gameImport.skipped) already present.",
             "Covers: \(coverDownload.downloaded) downloaded for newly imported games.",
@@ -288,7 +288,7 @@ final class InitialContentBootstrap {
             return InitialLogoImportResult(found: true, imported: true)
         } catch {
             NSLog(
-                "[ARMSX2 iOS Folder] logo import failed source=%@ error=%@",
+                "[Psxp Folder] logo import failed source=%@ error=%@",
                 sourceURL.path,
                 error.localizedDescription
             )
@@ -311,7 +311,7 @@ final class InitialContentBootstrap {
             return InitialAudioPackImportResult(found: true, imported: true)
         } catch {
             NSLog(
-                "[ARMSX2 iOS Folder] audio pack import failed source=%@ error=%@",
+                "[Psxp Folder] audio pack import failed source=%@ error=%@",
                 sourceURL.path,
                 error.localizedDescription
             )
@@ -407,7 +407,7 @@ final class InitialContentBootstrap {
                 } catch {
                     result.failed += 1
                     NSLog(
-                        "[ARMSX2 iOS Folder] skin import failed source=%@ error=%@",
+                        "[Psxp Folder] skin import failed source=%@ error=%@",
                         sourceURL.path,
                         error.localizedDescription
                     )
@@ -582,7 +582,7 @@ private enum InitialContentFileInstaller {
                     biosCopied += 1
                 } catch {
                     NSLog(
-                        "[ARMSX2 iOS Folder] BIOS import failed source=%@ error=%@",
+                        "[Psxp Folder] BIOS import failed source=%@ error=%@",
                         source.path,
                         error.localizedDescription
                     )
@@ -658,7 +658,7 @@ private enum InitialContentFileInstaller {
             } catch {
                 result.failed += 1
                 NSLog(
-                    "[ARMSX2 iOS Folder] game import failed source=%@ error=%@",
+                    "[Psxp Folder] game import failed source=%@ error=%@",
                     source.path,
                     error.localizedDescription
                 )

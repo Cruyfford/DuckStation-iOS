@@ -9,7 +9,7 @@ enum ImportFileCopier {
         do {
             try FileManager.default.copyItem(at: sourceURL, to: destinationURL)
         } catch {
-            NSLog("[ARMSX2 iOS Import] copyItem failed for %@, retrying with streaming copy: %@",
+            NSLog("[Psxp Import] copyItem failed for %@, retrying with streaming copy: %@",
                   sourceURL.lastPathComponent, error.localizedDescription)
             try copyByStreaming(from: sourceURL, to: destinationURL)
         }

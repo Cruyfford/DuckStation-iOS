@@ -3,3 +3,4 @@
 // SPDX-License-Identifier: GPL-3.0+
 
 #import "ARMSX2Bridge.h"
+#import "DSCheats.h"

@@ -351,7 +351,7 @@ final class CoverThumbnailCache: @unchecked Sendable {
                 0,
                 thumbnailOptions
               ) else {
-            NSLog("[ARMSX2 iOS Covers] thumbnail decode failed %@", path)
+            NSLog("[Psxp Covers] thumbnail decode failed %@", path)
             return nil
         }
 

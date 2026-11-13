@@ -17,7 +17,7 @@ final class PatchStore {
     static let cheatsSection = "Cheats"
     static let patchesSection = "Patches"
     static let enableKey = "Enable"
-    nonisolated static let defaultPatchDatabaseURLTemplate = "https://raw.githubusercontent.com/PCSX2/pcsx2_patches/main/patches/${serial}_${crc}.pnach"
+    nonisolated static let defaultPatchDatabaseURLTemplate = "https://raw.githubusercontent.com/Psxp/pcsx2_patches/main/patches/${serial}_${crc}.pnach"
     nonisolated static let defaultCheatDatabaseURLTemplate = "https://raw.githubusercontent.com/xs1l3n7x/pcsx2_cheats_collection/main/cheats/${serial}_${crc}.pnach"
     nonisolated static let defaultUltraWidescreenPatchURLTemplate = "https://raw.githubusercontent.com/henyckma/ARMSX2-UltraWidescreen-NaturalVision/main/patches/${serial}_${crc}.pnach"
 
@@ -51,7 +51,7 @@ final class PatchStore {
             case .success: return "Patch installed. Some changes apply after restarting the game."
             case .invalid(let reason): return "This is not a valid patch: \(reason)"
             case .blockedByHardcore: return "Enabling cheats and patches is blocked while RetroAchievements Hardcore Mode is enabled."
-            case .noIdentity: return "ARMSX2 could not find a safe patch location for this game."
+            case .noIdentity: return "Psxp could not find a safe patch location for this game."
             case .writeFailed(let reason): return "Could not save the patch: \(reason)"
             }
         }
@@ -860,7 +860,7 @@ final class PatchStore {
         do {
             try encoder.encode(sidecar).write(to: sidecarURL, options: .atomic)
         } catch {
-            NSLog("[ARMSX2 iOS Patches] sidecar save failed: %@", error.localizedDescription)
+            NSLog("[Psxp Patches] sidecar save failed: %@", error.localizedDescription)
         }
     }
 

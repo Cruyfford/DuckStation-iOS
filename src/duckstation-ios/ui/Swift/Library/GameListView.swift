@@ -3336,7 +3336,7 @@ struct GameListView: View {
                         Button {
                             presentMenuPanel {
                                 coverStore.coverURLTemplate = CoverStore.defaultCoverURLTemplate
-                                coverStore.lastCoverMessage = "Cover URL template reset to the ARMSX2 Android default."
+                                coverStore.lastCoverMessage = "Cover URL template reset to the Psxp Android default."
                                 coverStore.showCoverAlert = true
                             }
                         } label: {
@@ -6332,7 +6332,7 @@ struct GameListView: View {
             presentMenuPanel {
                 coverStore.coverURLTemplate = CoverStore.defaultCoverURLTemplate
                 coverStore.lastCoverMessage =
-                    "Cover URL template reset to the ARMSX2 Android default."
+                    "Cover URL template reset to the Psxp Android default."
                 coverStore.showCoverAlert = true
             }
             controllerInput?.playFeedback(.activate)
@@ -8386,7 +8386,7 @@ struct GameListView: View {
         )
         if !applied {
             NSLog(
-                "[ARMSX2 iOS Skins] automatic per-game assignment failed serial=%@",
+                "[Psxp Skins] automatic per-game assignment failed serial=%@",
                 proposal.serial
             )
         } else if let descriptor = VPadSkinLibraryStore.shared.descriptor(

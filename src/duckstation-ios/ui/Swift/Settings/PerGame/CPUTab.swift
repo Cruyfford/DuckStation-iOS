@@ -103,7 +103,7 @@ struct CPUTab: View {
                 )
                 .disabled(!enabled)
 
-                Text(settings.localized("IOP, VU0, and VU1 handle PS2 sub-processors. JIT is much faster; Interpreter is a fallback for the rare game that breaks under JIT. Reset or relaunch the game after changing these."))
+                Text(settings.localized("IOP, VU0, and VU1 handle PS1 sub-processors. JIT is much faster; Interpreter is a fallback for the rare game that breaks under JIT. Reset or relaunch the game after changing these."))
                     .font(.caption)
                     .foregroundStyle(.secondary)
             }

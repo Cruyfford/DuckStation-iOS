@@ -192,7 +192,7 @@ struct GraphicsSettingsView: View {
                         ]
                     )
                     Text(settings.localized(
-                        "GPU-accelerated upscaling via MetalFX. Renders at the native PS2 "
+                        "GPU-accelerated upscaling via MetalFX. Renders at the native PS1 "
                         + "resolution and upscales to the display for sharper visuals at "
                         + "lower cost than a higher internal resolution. Applies immediately."
                     ))
@@ -205,7 +205,7 @@ struct GraphicsSettingsView: View {
                 Picker(settings.localized("Texture Filtering"), selection: $settings.textureFiltering) {
                     Text(settings.localized("Nearest (Pixelated)")).tag(0)
                     Text(settings.localized("Bilinear (Forced)")).tag(1)
-                    Text(settings.localized("Bilinear (PS2 Default)")).tag(2)
+                    Text(settings.localized("Bilinear (PS1 Default)")).tag(2)
                     Text(settings.localized("Bilinear (Forced excl. Sprite)")).tag(3)
                 }
                 .controllerAccessibilityOptionsPickerTarget(
@@ -214,13 +214,13 @@ struct GraphicsSettingsView: View {
                     options: [
                         (0, settings.localized("Nearest (Pixelated)")),
                         (1, settings.localized("Bilinear (Forced)")),
-                        (2, settings.localized("Bilinear (PS2 Default)")),
+                        (2, settings.localized("Bilinear (PS1 Default)")),
                         (3, settings.localized("Bilinear (Forced excl. Sprite)")),
                     ]
                 )
 
                 Toggle(settings.localized("Hardware Mipmapping"), isOn: $settings.hardwareMipmapping)
-                Text(settings.localized("Emulates PS2 texture mipmaps in the hardware renderer. Leave on by default; turn off only if a game has mipmap shimmer, stripes, or bad texture LOD behavior. Requires reset/relaunch for safest results."))
+                Text(settings.localized("Emulates PS1 texture mipmaps in the hardware renderer. Leave on by default; turn off only if a game has mipmap shimmer, stripes, or bad texture LOD behavior. Requires reset/relaunch for safest results."))
                     .font(.caption)
                     .foregroundStyle(.secondary)
 

@@ -107,7 +107,7 @@ final class SaveStateMetadataStore {
         do {
             try encoder.encode(file).write(to: url, options: .atomic)
         } catch {
-            NSLog("[ARMSX2 iOS SaveState] metadata write failed: %@", error.localizedDescription)
+            NSLog("[Psxp SaveState] metadata write failed: %@", error.localizedDescription)
         }
     }
 }

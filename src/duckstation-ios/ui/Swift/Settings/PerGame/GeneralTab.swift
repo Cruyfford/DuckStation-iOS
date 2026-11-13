@@ -103,7 +103,7 @@ struct PerGameLivePreviewSection: View {
             }
 
             Text(settings.localized(savesToRunningGame
-                ? "When a setting changes, the panel hides and keeps the changed result visible. When Circle-only exit is enabled, Left and Right continue changing the focused value and Circle returns to the panel. Original View Duration can show the unchanged scene first; set it to 0s for an immediate preview. ARMSX2 then restores the same gameplay moment using a private temporary state that never occupies a save slot."
+                ? "When a setting changes, the panel hides and keeps the changed result visible. When Circle-only exit is enabled, Left and Right continue changing the focused value and Circle returns to the panel. Original View Duration can show the unchanged scene first; set it to 0s for an immediate preview. Psxp then restores the same gameplay moment using a private temporary state that never occupies a save slot."
                 : "Live previews are available when Per-Game Settings is opened while a game is running."))
                 .font(.caption)
                 .foregroundStyle(.secondary)

@@ -130,7 +130,7 @@ enum PatchSource: String, Codable {
             return "UltraWidescreen / NaturalVision"
         }
         if template == PatchStore.defaultCheatDatabaseURLTemplate {
-            return "PCSX2 cheat collection"
+            return "Psxp cheat collection"
         }
         // Fall back to the URL host so user-added sources get a readable label.
         if let host = URL(string: template)?.host { return host }

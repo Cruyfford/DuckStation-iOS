@@ -56,7 +56,7 @@ extension SettingsStore {
 
         if allDefaults {
             ARMSX2Bridge.setINIInt("ARMSX2iOS/FramePacing", key: "Preset", value: Int32(FramePacingPreset.optimal.rawValue))
-            NSLog("[ARMSX2 iOS Settings] Frame Pacing migration: applying Optimal preset")
+            NSLog("[Psxp Settings] Frame Pacing migration: applying Optimal preset")
             // Write the Optimal table straight to the INI. SettingsStore.init
             // reads these keys back next, so they become authoritative. This
             // mirrors applyFramePacingPreset(.optimal) but cannot call it —
@@ -68,7 +68,7 @@ extension SettingsStore {
             ARMSX2Bridge.setINIFloat("Framerate", key: "NominalScalar", value: 1.0)
         } else {
             ARMSX2Bridge.setINIInt("ARMSX2iOS/FramePacing", key: "Preset", value: Int32(FramePacingPreset.custom.rawValue))
-            NSLog("[ARMSX2 iOS Settings] Frame Pacing migration: preserving user values as Custom")
+            NSLog("[Psxp Settings] Frame Pacing migration: preserving user values as Custom")
         }
 
         ARMSX2Bridge.setINIBool("ARMSX2iOS/Migrations", key: "FramePacingOptimalDefaultV1", value: true)

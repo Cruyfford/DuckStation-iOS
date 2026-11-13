@@ -85,7 +85,7 @@ struct BackgroundSourcePicker: ViewModifier {
             onImport(asset)
         } catch {
             showLoadError = true
-            NSLog("[ARMSX2 Background] photo import failed: %@", error.localizedDescription)
+            NSLog("[Psxp Background] photo import failed: %@", error.localizedDescription)
         }
     }
 
@@ -117,7 +117,7 @@ struct BackgroundSourcePicker: ViewModifier {
                 onImport(asset)
             } catch {
                 showLoadError = true
-                NSLog("[ARMSX2 Background] file import failed: %@", error.localizedDescription)
+                NSLog("[Psxp Background] file import failed: %@", error.localizedDescription)
             }
         }
     }

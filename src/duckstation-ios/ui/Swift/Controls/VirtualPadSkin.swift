@@ -42,7 +42,7 @@ enum VirtualPadSkin: Int, CaseIterable, Identifiable {
         case .custom:
             return "Custom Imported"
         case .legacyRefresh:
-            return "ARMSX2 Refresh Legacy"
+            return "Psxp Refresh Legacy"
         case .fullWhite:
             return "Full White"
         case .whiteDS:
@@ -73,7 +73,7 @@ enum VirtualPadSkin: Int, CaseIterable, Identifiable {
         case .custom:
             return "Loads user-imported button images or a full portrait/landscape skin from the custom skin folder."
         case .legacyRefresh:
-            return "Uses the previous ARMSX2 refresh controller art."
+            return "Uses the previous Psxp refresh controller art."
         case .fullWhite, .whiteDS, .whiteFullColorButton, .blackColored, .blackDS, .blackWhite, .liquidGlass, .black, .xbox:
             return "Uses a bundled controller skin."
         }

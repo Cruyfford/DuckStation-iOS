@@ -337,7 +337,7 @@ final class AutomaticCustomSkinManager {
             skins = try await fetchCatalogSkins()
         } catch {
             NSLog(
-                "[ARMSX2 iOS Skins] catalog listing failed serial=%@ error=%@",
+                "[Psxp Skins] catalog listing failed serial=%@ error=%@",
                 serial,
                 error.localizedDescription
             )
@@ -653,7 +653,7 @@ final class AutomaticCustomSkinManager {
             // lookup; do not spin immediately while the network is offline.
             queuedSerials.removeAll()
             NSLog(
-                "[ARMSX2 iOS Skins] automatic catalog lookup failed: %@",
+                "[Psxp Skins] automatic catalog lookup failed: %@",
                 error.localizedDescription
             )
         }
@@ -741,7 +741,7 @@ final class AutomaticCustomSkinManager {
             )
         } catch {
             NSLog(
-                "[ARMSX2 iOS Skins] catalog download failed serial=%@ skin=%@ error=%@",
+                "[Psxp Skins] catalog download failed serial=%@ skin=%@ error=%@",
                 serial,
                 skin.name,
                 error.localizedDescription

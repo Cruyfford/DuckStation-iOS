@@ -32,8 +32,8 @@ extension AppIconOption {
         AppIconOption(id: "appicon-light", displayName: "Light", previewName: "appicon-light"),
         AppIconOption(id: "appicon-mystic", displayName: "Mystic Purple", previewName: "appicon-mystic"),
         AppIconOption(id: "appicon-purple", displayName: "Purple", previewName: "appicon-purple"),
-        AppIconOption(id: "appicon-pridedark", displayName: "ARMSX2 Pride Dark", previewName: "appicon-pridedark"),
-        AppIconOption(id: "appicon-pridelight", displayName: "ARMSX2 Pride Light", previewName: "appicon-pridelight")
+        AppIconOption(id: "appicon-pridedark", displayName: "Psxp Pride Dark", previewName: "appicon-pridedark"),
+        AppIconOption(id: "appicon-pridelight", displayName: "Psxp Pride Light", previewName: "appicon-pridelight")
     ]
 }
 
@@ -105,7 +105,7 @@ struct AppIconSettingsView: View {
                 get: { pendingExport != nil },
                 set: { if !$0 { pendingExport = nil } }
             ),
-            message: settings.localized("iOS rejected the icon change. This can happen when ARMSX2 runs inside another app’s container. The icons are bundled — you can export one instead."),
+            message: settings.localized("iOS rejected the icon change. This can happen when Psxp runs inside another app’s container. The icons are bundled — you can export one instead."),
             actions: [
                 .ok,
                 .init(title: settings.localized("Export Icon")) {
@@ -199,7 +199,7 @@ struct AppIconSettingsView: View {
         } header: {
             Text(settings.localized("Logo"))
         } footer: {
-            Text(settings.localized("The optional logo.png replaces Boot BIOS in the Games toolbar and is also used by the ARMSX2 Logo dynamic-background effect."))
+            Text(settings.localized("The optional logo.png replaces Boot BIOS in the Games toolbar and is also used by the Psxp Logo dynamic-background effect."))
         }
     }
 
@@ -213,7 +213,7 @@ struct AppIconSettingsView: View {
         VStack(alignment: .leading, spacing: 6) {
             Text(settings.localized("External container install detected"))
                 .font(.subheadline.weight(.semibold))
-            Text(settings.localized("Apps running inside a host container such as LiveContainer can’t change their Home Screen icon directly — the icon belongs to the host, not ARMSX2. Export an icon and set it as your LiveContainer Home Screen shortcut icon."))
+            Text(settings.localized("Apps running inside a host container such as LiveContainer can’t change their Home Screen icon directly — the icon belongs to the host, not Psxp. Export an icon and set it as your LiveContainer Home Screen shortcut icon."))
                 .font(.footnote)
                 .foregroundStyle(.secondary)
         }
@@ -337,7 +337,7 @@ struct AppIconSettingsView: View {
                 try await UIApplication.shared.setAlternateIconName(option.id)
                 currentIcon = UIApplication.shared.alternateIconName
             } catch {
-                NSLog("[ARMSX2 iOS AppIcon] setAlternateIconName failed: %@", error.localizedDescription)
+                NSLog("[Psxp AppIcon] setAlternateIconName failed: %@", error.localizedDescription)
                 pendingExport = option
             }
         }
@@ -365,7 +365,7 @@ struct AppIconSettingsView: View {
             try FileManager.default.copyItem(at: source, to: destination)
             return destination
         } catch {
-            NSLog("[ARMSX2 iOS AppIcon] export prepare failed: %@", error.localizedDescription)
+            NSLog("[Psxp AppIcon] export prepare failed: %@", error.localizedDescription)
             return nil
         }
     }

@@ -30,7 +30,7 @@ enum PlayStation3XMBByMartShaderLibrary {
       return library
     } catch {
       NSLog(
-        "[ARMSX2 Dynamic Backgrounds] XMB shader compilation failed: %@",
+        "[Psxp Dynamic Backgrounds] XMB shader compilation failed: %@",
         error.localizedDescription
       )
       return nil

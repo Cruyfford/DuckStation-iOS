@@ -722,7 +722,7 @@ final class PadLayoutPresetStore: @unchecked Sendable {
         do {
             try save()
         } catch {
-            NSLog("[ARMSX2 iOS VPad] Failed to save layout presets: %@", error.localizedDescription)
+            NSLog("[Psxp VPad] Failed to save layout presets: %@", error.localizedDescription)
         }
     }
 

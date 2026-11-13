@@ -26,6 +26,7 @@ add_custom_command(
 set(OBJC_SOURCES
   ios_host.mm
   "${UI_DIR}/Bridge/DSBridge.mm"
+  "${UI_DIR}/Bridge/DSCheats.mm"
   "${BRIDGE_STUBS}"
   "${UI_DIR}/Runtime/DSRuntime.mm"
 )

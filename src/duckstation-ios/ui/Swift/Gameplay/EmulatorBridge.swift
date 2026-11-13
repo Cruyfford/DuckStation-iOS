@@ -11,7 +11,7 @@ enum StikDebugLauncher {
     private static let lastAutoOpenKey = "ARMSX2iOSLastStikDebugAutoOpenTime"
     private static let autoOpenCooldown: TimeInterval = 120
     private static func log(_ message: String) {
-        print("[ARMSX2 iOS] StikDebug \(message)")
+        print("[Psxp] StikDebug \(message)")
     }
 
     static func open(reason: String = "manual", completion: ((Bool) -> Void)? = nil) {

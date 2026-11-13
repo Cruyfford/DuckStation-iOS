@@ -90,7 +90,7 @@ struct GraphicsTab: View {
     private static let textureFilteringOptionsEnum: [(id: Int, title: String)] = [
         (0, "Nearest"),
         (1, "Bilinear Forced"),
-        (2, "Bilinear PS2 Default"),
+        (2, "Bilinear PS1 Default"),
         (3, "Bilinear excl. Sprite")
     ]
     private static let blendingAccuracyOptions: [(id: Int, title: String)] = [

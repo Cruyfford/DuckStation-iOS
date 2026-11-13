@@ -17,7 +17,7 @@ extension SettingsStore {
         if !migrated && JITScriptProtocol.defaultValue == .legacy && protocolValue == .universal {
             ARMSX2Bridge.setINIString("ARMSX2iOS/JIT", key: "ScriptProtocol", value: JITScriptProtocol.legacy.rawValue)
             ARMSX2Bridge.setINIBool("ARMSX2iOS/Migrations", key: "JITScriptProtocolByOSV1", value: true)
-            NSLog("[ARMSX2 iOS Settings] Migrated JIT script protocol to legacy for this iOS version")
+            NSLog("[Psxp Settings] Migrated JIT script protocol to legacy for this iOS version")
             return .legacy
         }
         if !migrated {

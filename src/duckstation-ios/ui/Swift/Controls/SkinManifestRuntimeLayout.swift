@@ -101,7 +101,7 @@ struct SkinManifestRuntimeLayout {
         let manifestURL = directory.appendingPathComponent(SkinManifestImporter.storedManifestFileName)
         guard let data = try? Data(contentsOf: manifestURL),
               let manifest = try? SkinManifestV2.decode(from: data) else {
-            NSLog("[ARMSX2 iOS Skins] v2 manifest could not be read; using legacy controls.")
+            NSLog("[Psxp Skins] v2 manifest could not be read; using legacy controls.")
             return nil
         }
 
@@ -111,7 +111,7 @@ struct SkinManifestRuntimeLayout {
             orientation: isLandscape ? .landscape : .portrait
         )
         guard let resolved = manifest.bestRepresentation(for: query) else {
-            NSLog("[ARMSX2 iOS Skins] no matching v2 representation; using legacy controls.")
+            NSLog("[Psxp Skins] no matching v2 representation; using legacy controls.")
             return nil
         }
         let representation = resolved.representation
@@ -120,7 +120,7 @@ struct SkinManifestRuntimeLayout {
               let mappingWidth = mappingSize.width,
               let mappingHeight = mappingSize.height,
               mappingWidth > 0, mappingHeight > 0 else {
-            NSLog("[ARMSX2 iOS Skins] v2 representation has no mapping size; using legacy controls.")
+            NSLog("[Psxp Skins] v2 representation has no mapping size; using legacy controls.")
             return nil
         }
         let defaultEdges = representation.extendedEdges
@@ -147,7 +147,7 @@ struct SkinManifestRuntimeLayout {
             let placement: Placement
             switch kind {
             case .function, .unknown:
-                NSLog("[ARMSX2 iOS Skins] skipping unsupported control '%@' (kind not rendered).", id)
+                NSLog("[Psxp Skins] skipping unsupported control '%@' (kind not rendered).", id)
                 placement = .inert
             case .thumbstick:
                 if referencedInputs.contains(where: { $0.hasPrefix("leftAnalog") }) {
@@ -155,7 +155,7 @@ struct SkinManifestRuntimeLayout {
                 } else if referencedInputs.contains(where: { $0.hasPrefix("rightAnalog") }) {
                     placement = .thumbstick(side: .right, click: raw.clickInput.flatMap(Self.mappedButton))
                 } else {
-                    NSLog("[ARMSX2 iOS Skins] thumbstick control '%@' has no analog inputs; skipping.", id)
+                    NSLog("[Psxp Skins] thumbstick control '%@' has no analog inputs; skipping.", id)
                     placement = .inert
                 }
             case .dpad:
@@ -164,7 +164,7 @@ struct SkinManifestRuntimeLayout {
                 if let first = referencedInputs.compactMap(Self.mappedButton).first {
                     placement = .button(first)
                 } else {
-                    NSLog("[ARMSX2 iOS Skins] button control '%@' has no mappable input; skipping.", id)
+                    NSLog("[Psxp Skins] button control '%@' has no mappable input; skipping.", id)
                     placement = .inert
                 }
             }

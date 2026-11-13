@@ -842,7 +842,7 @@ struct CheatsPatchesManagerView: View {
                 .modifier(controllerFocus(.saveSources))
                 .id(ControllerTarget.saveSources)
 
-                Text(settings.localized("Supported placeholders: \u{24}{serial}, \u{24}{crc}, and \u{24}{title}. Built-in sources provide PCSX2 patches, an UltraWidescreen / NaturalVision pack, and a community cheat collection. Only add sources you trust."))
+                Text(settings.localized("Supported placeholders: \u{24}{serial}, \u{24}{crc}, and \u{24}{title}. Built-in sources provide Psxp patches, an UltraWidescreen / NaturalVision pack, and a community cheat collection. Only add sources you trust."))
                     .font(.caption)
                     .foregroundStyle(.secondary)
                     .fixedSize(horizontal: false, vertical: true)

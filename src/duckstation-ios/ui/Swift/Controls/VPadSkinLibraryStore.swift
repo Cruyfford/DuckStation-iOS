@@ -852,7 +852,7 @@ final class VPadSkinLibraryStore: @unchecked Sendable {
         do {
             try save()
         } catch {
-            NSLog("[ARMSX2 iOS Skins] Failed to save skin library: %@", error.localizedDescription)
+            NSLog("[Psxp Skins] Failed to save skin library: %@", error.localizedDescription)
         }
     }
 

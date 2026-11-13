@@ -61,7 +61,7 @@ enum DynamicBackgroundStyle: String, CaseIterable, Identifiable, Codable {
     case .lightSpeed:
       return "Light Speed"
     case .spatialRetro:
-      return "Spatial Retro"
+      return "Psxp 2026"
     case .towersOrbs:
       return "Towers Orbs"
     case .playStation2Menu:
@@ -120,7 +120,7 @@ enum DynamicBackgroundStyle: String, CaseIterable, Identifiable, Codable {
     case .multicolorAmbient: legacyName = "Orbit Ambient"
     case .lightSpeed: legacyName = "Space"
     case .spatialRetro: legacyName = "PS1 Style"
-    case .towersOrbs: legacyName = "PS2 Towers"
+    case .towersOrbs: legacyName = "PS1 Towers"
     case .playStation2Menu: legacyName = "Towers Sky"
     case .playStation3XMBByMart: legacyName = "PlayStation 3 XMB by Mart"
     case .faceButtons: legacyName = "Face Buttons"

@@ -25,7 +25,7 @@ enum DynamicParticleStyle: String, CaseIterable, Identifiable, Codable {
     case .xmbMart:
       return "Glass Ribbons by Mart"
     case .armsx2BouncingLogo:
-      return "ARMSX2 Bouncing Logo"
+      return "Psxp Bouncing Logo"
     case .ps1Dust:
       return "Pixel Dust"
     case .ps4Glow:
