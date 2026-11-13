@@ -1,0 +1,39 @@
+name: StikPair IPA
+on:
+  push:
+    branches: [stikpair-ipa]
+  workflow_dispatch:
+jobs:
+  build:
+    runs-on: macos-26
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+      - name: Select newest Xcode
+        run: |
+          ls -d /Applications/Xcode*.app
+          X=$(ls -d /Applications/Xcode_*.app | sort -V | tail -n 1)
+          sudo xcode-select -s "$X"
+          xcodebuild -version
+          xcodebuild -showsdks | grep -i ios
+      - name: Tools
+        run: |
+          brew install xcodegen || true
+          rustup target add aarch64-apple-ios aarch64-apple-ios-sim
+      - name: Build Rust FFI
+        run: DEVELOPER_DIR="$(xcode-select -p)" bash build-rust.sh
+      - name: Build app (unsigned)
+        run: |
+          xcodegen generate
+          xcodebuild -project StikPair.xcodeproj -scheme StikPair -configuration Release \
+            -sdk iphoneos -destination 'generic/platform=iOS' -derivedDataPath build \
+            CODE_SIGNING_ALLOWED=NO CODE_SIGNING_REQUIRED=NO CODE_SIGN_IDENTITY="" build
+      - name: Package IPA
+        run: |
+          mkdir -p Payload
+          cp -R build/Build/Products/Release-iphoneos/StikPair.app Payload/
+          zip -qry StikPair.ipa Payload
+      - uses: actions/upload-artifact@v4
+        with:
+          name: StikPair-ipa
+          path: StikPair.ipa
