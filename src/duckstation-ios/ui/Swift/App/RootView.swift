@@ -894,7 +894,8 @@ struct RootView: View {
                 }
             } else {
                 menuControllerInput.setLaunchInputInterceptor(nil)
-                MenuAudioPackManager.shared.introDidFinish(playsStartupSound: false)
+                // DuckStation: no boot movie, so the startup chime plays as the library appears.
+                MenuAudioPackManager.shared.introDidFinish(playsStartupSound: true)
             }
             menuControllerInput.setMenuActive(menuScreenActive)
             StikDebugLauncher.autoOpenIfNeeded(reason: "app launch")

@@ -1993,18 +1993,19 @@ enum ControllerUIThemePreset: String, CaseIterable, Identifiable, Codable {
         case .defaultTheme:
             // Keep the stock preset on the standard Blue/Cyan dynamic
             // palettes. Heny Blue remains the opt-in custom-gradient variant.
+            // DuckStation: the stock preset is the PS1 2026 look.
             return dynamicTheme(
-                .playStation3XMBByMart,
-                .blue,
-                .cyan,
-                dark: 0.28,
+                .spatialRetro,
+                .platinumGrey,
+                .silver,
+                dark: 1.0,
                 particles: true,
-                style: .xmb3,
-                amount: 0.8,
-                speed: 1.1,
-                brightness: 0.8,
-                motion: 1.05,
-                armsx2Logo: true
+                style: .ps1Dust,
+                amount: 0.45,
+                speed: 0.45,
+                brightness: 0.6,
+                motion: 0.6,
+                armsx2Logo: false
             )
         case .neon:
             return dynamicTheme(.playStation2Menu, .blue, .cyan, dark: 0.85, style: .xmb3, amount: 0.8, speed: 1.1, brightness: 0.8, motion: 1.05)

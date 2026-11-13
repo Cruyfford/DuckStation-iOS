@@ -566,10 +566,23 @@ struct DynamicAppearancePreferences: Codable, Equatable {
     ribbonPalette: .silver,
     ribbonCustomColor: nil,
     ribbonMultiColor: ThemeMultiColorSelection(),
-    particleSettings: DynamicParticleSettings(),
+    particleSettings: standardParticleSettings,
     hasSelectedPlayStation3XMBByMart: false,
     isPlayStation3XMBPresetExplicit: false
   )
+
+  // DuckStation 2026 look: slow PS1-style dust, no ARMSX2 logo overlay.
+  static var standardParticleSettings: DynamicParticleSettings {
+    var settings = DynamicParticleSettings()
+    settings.isEnabled = true
+    settings.style = .ps1Dust
+    settings.amount = 0.45
+    settings.speed = 0.45
+    settings.brightness = 0.6
+    settings.faceButtonsEnabled = false
+    settings.armsx2LogoEnabled = false
+    return settings
+  }
 
   static func load(from userDefaults: UserDefaults = .standard) -> Self? {
     guard

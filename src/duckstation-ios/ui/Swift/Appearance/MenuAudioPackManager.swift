@@ -81,6 +81,11 @@ final class MenuAudioPackManager {
         Sound.allCases.filter { $0 != .startup && $0 != .pauseMusic }
     )
     private nonisolated static let bundledResources: [Sound: BundledResource] = [
+        .startup: BundledResource(
+            name: "sfx_startup",
+            pathExtension: "wav",
+            subdirectory: "ui_audio/default"
+        ),
         .achievementToast: BundledResource(
             name: "unlock",
             pathExtension: "wav",

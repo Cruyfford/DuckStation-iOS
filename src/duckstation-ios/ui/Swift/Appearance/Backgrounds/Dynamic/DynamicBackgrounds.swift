@@ -623,6 +623,17 @@ struct SpatialRetroBackground: View {
             time: time,
             color: primary
           )
+          drawCompactDisc(
+            context: &context,
+            size: size,
+            time: time,
+            rim: highlight
+          )
+          drawLightSweep(
+            context: &context,
+            size: size,
+            time: time
+          )
           drawPixelDust(
             context: &context,
             size: size,
@@ -696,6 +707,110 @@ struct SpatialRetroBackground: View {
         lineWidth: 0.6 + progress
       )
     }
+  }
+
+  // DuckStation 2026: a large black game disc turning slowly in the corner,
+  // its data side catching an iridescent sheen as it spins.
+  private func drawCompactDisc(
+    context: inout GraphicsContext,
+    size: CGSize,
+    time: TimeInterval,
+    rim: Color
+  ) {
+    let landscape = size.width > size.height
+    let radius = min(size.width, size.height) * (landscape ? 0.62 : 0.55)
+    let center = CGPoint(
+      x: size.width * (landscape ? 0.86 : 0.92),
+      y: size.height * (landscape ? 0.86 : 0.80)
+        + CGFloat(sin(time * 0.11)) * 6
+    )
+    let discRect = CGRect(
+      x: center.x - radius,
+      y: center.y - radius,
+      width: radius * 2,
+      height: radius * 2
+    )
+    let disc = Path(ellipseIn: discRect)
+
+    // Soft glow behind the disc.
+    context.drawLayer { layer in
+      layer.addFilter(.blur(radius: 46))
+      layer.fill(
+        Path(ellipseIn: discRect.insetBy(dx: -radius * 0.04, dy: -radius * 0.04)),
+        with: .color(rim.opacity(0.16))
+      )
+    }
+
+    context.fill(disc, with: .color(Color(red: 0.035, green: 0.037, blue: 0.045).opacity(0.94)))
+
+    // Iridescent sheen, rotating with the disc.
+    let spin = Angle(radians: time * 0.35)
+    let sheen = Gradient(stops: [
+      .init(color: .clear, location: 0.00),
+      .init(color: Color(red: 0.35, green: 0.55, blue: 1.0).opacity(0.30), location: 0.07),
+      .init(color: Color(red: 0.55, green: 1.0, blue: 0.85).opacity(0.24), location: 0.12),
+      .init(color: Color(red: 1.0, green: 0.85, blue: 0.45).opacity(0.18), location: 0.17),
+      .init(color: .clear, location: 0.26),
+      .init(color: .clear, location: 0.50),
+      .init(color: Color(red: 0.85, green: 0.45, blue: 1.0).opacity(0.26), location: 0.57),
+      .init(color: Color(red: 0.35, green: 0.85, blue: 1.0).opacity(0.22), location: 0.63),
+      .init(color: .clear, location: 0.74),
+      .init(color: .clear, location: 1.00),
+    ])
+    context.fill(disc, with: .conicGradient(sheen, center: center, angle: spin))
+
+    // Concentric data tracks.
+    for ring in 0..<7 {
+      let r = radius * (0.40 + CGFloat(ring) * 0.085)
+      context.stroke(
+        Path(ellipseIn: CGRect(x: center.x - r, y: center.y - r, width: r * 2, height: r * 2)),
+        with: .color(.white.opacity(0.025 + Double(ring % 2) * 0.015)),
+        lineWidth: 0.6
+      )
+    }
+
+    // Outer rim, clear hub ring and spindle hole.
+    context.stroke(disc, with: .color(rim.opacity(0.28)), lineWidth: 1.2)
+    let hub = radius * 0.30
+    context.fill(
+      Path(ellipseIn: CGRect(x: center.x - hub, y: center.y - hub, width: hub * 2, height: hub * 2)),
+      with: .color(Color(white: 0.55).opacity(0.10))
+    )
+    let hole = radius * 0.075
+    context.fill(
+      Path(ellipseIn: CGRect(x: center.x - hole, y: center.y - hole, width: hole * 2, height: hole * 2)),
+      with: .color(.black.opacity(0.85))
+    )
+    context.stroke(
+      Path(ellipseIn: CGRect(x: center.x - hole, y: center.y - hole, width: hole * 2, height: hole * 2)),
+      with: .color(.white.opacity(0.18)),
+      lineWidth: 0.8
+    )
+  }
+
+  // A wide, faint band of light that drifts across the scene every few seconds.
+  private func drawLightSweep(
+    context: inout GraphicsContext,
+    size: CGSize,
+    time: TimeInterval
+  ) {
+    let period = 14.0
+    let phase = CGFloat((time / period).truncatingRemainder(dividingBy: 1))
+    let span = size.width + size.height
+    let x = -size.height + phase * (span + size.height * 0.5)
+    let band = Gradient(stops: [
+      .init(color: .clear, location: 0),
+      .init(color: .white.opacity(0.055), location: 0.5),
+      .init(color: .clear, location: 1),
+    ])
+    context.fill(
+      Path(CGRect(origin: .zero, size: size)),
+      with: .linearGradient(
+        band,
+        startPoint: CGPoint(x: x, y: 0),
+        endPoint: CGPoint(x: x + size.height * 0.45, y: size.height * 0.35)
+      )
+    )
   }
 
   // Draws small pixels that drift upward over the PS1-style grid.

@@ -137,6 +137,18 @@ static void DSHostEvent(IOSHost::Event event, const char* message)
       [fm removeItemAtPath:from error:nil];
   }
 
+  // One-time switch to the DuckStation 2026 look: drop appearance state saved by earlier builds
+  // (ARMSX2's blue XMB defaults) so the PS1-style background and theme apply.
+  NSUserDefaults* defaults = NSUserDefaults.standardUserDefaults;
+  if (![defaults boolForKey:@"DSAppearance2026Applied"])
+  {
+    for (NSString* key in @[@"ARMSX2iOSDynamicAppearancePreferences", @"ARMSX2iOSControllerUIThemePreset",
+                            @"ARMSX2iOSCustomAppearanceDraftV1"])
+      [defaults removeObjectForKey:key];
+    [defaults setBool:YES forKey:@"ARMSX2iOSDynamicBackgroundsEnabled"];
+    [defaults setBool:YES forKey:@"DSAppearance2026Applied"];
+  }
+
   IOSHost::SetEventCallback(&DSHostEvent);
   std::string error;
   if (!IOSHost::Initialize(std::string(documents.fileSystemRepresentation),

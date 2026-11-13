@@ -89,6 +89,9 @@ cp -R "$UI_ASSETS/shaders" "$APP/shaders"
 find "$UI_ASSETS/app_icons" -name '*.png' -exec cp {} "$APP/" \;
 mkdir -p "$APP/ui_audio/default"
 cp "$UI_ASSETS"/ui_audio/* "$APP/ui_audio/default/"
+# The menu audio pack also needs the notification sounds; without them no UI audio loads at all.
+mkdir -p "$APP/sounds"
+cp -R "$ROOT_DIR"/data/resources/sounds/achievements "$APP/sounds/"
 find "$UI_ASSETS/resources" -maxdepth 1 -type f ! -name '*.xcstrings' -exec cp {} "$APP/" \;
 ls -d "$APP"/*.lproj
 
